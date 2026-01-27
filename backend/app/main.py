@@ -54,13 +54,19 @@ def require_moderator(user: User) -> None:
     if not MODERATOR_EMAILS:
         raise HTTPException(
             status_code=403,
-            detail={"code": "FORBIDDEN", "message": "Moderator access is not configured."},
+            detail={"code": "FORBIDDEN", "message": "Moderator access is not configured. MODERATOR_EMAILS environment variable is not set or empty."},
         )
 
-    if (user.email or "").strip().lower() not in MODERATOR_EMAILS:
+    user_email_normalized = (user.email or "").strip().lower()
+    if user_email_normalized not in MODERATOR_EMAILS:
         raise HTTPException(
             status_code=403,
-            detail={"code": "FORBIDDEN", "message": "Moderator only"},
+            detail={
+                "code": "FORBIDDEN", 
+                "message": f"Moderator only. Your email ({user.email}) is not in the moderator list.",
+                "user_email": user.email,
+                "moderator_emails_count": len(MODERATOR_EMAILS)
+            },
         )
 
 
