@@ -504,6 +504,22 @@ async def login(payload: LoginByEmail, db: DbDep):
 async def read_users_me(current_user: CurrentUser):
     return UserOut(id=current_user.id, username=current_user.username, email=current_user.email)
 
+@app.get("/moderation/check")
+async def check_moderator_status(current_user: CurrentUser):
+    """Debug endpoint to check moderator status - helps troubleshoot moderator access issues."""
+    user_email_lower = (current_user.email or "").strip().lower()
+    is_configured = bool(MODERATOR_EMAILS)
+    is_moderator = user_email_lower in MODERATOR_EMAILS
+    
+    return {
+        "user_email": current_user.email,
+        "user_email_normalized": user_email_lower,
+        "moderator_emails_configured": is_configured,
+        "moderator_emails_count": len(MODERATOR_EMAILS),
+        "is_moderator": is_moderator,
+        "configured_emails": list(MODERATOR_EMAILS) if is_moderator else []  # Only show if already a moderator
+    }
+
 # =========================
 # Opportunities + Saved
 # =========================
