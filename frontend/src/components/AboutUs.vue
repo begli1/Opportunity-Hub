@@ -151,96 +151,11 @@
 
         <!-- Team Section -->
         <section class="team-section">
-          <h2 class="section-title">
-            <span class="section-icon">👥</span>
-            Meet Our Team
-          </h2>
-          <p class="team-intro">
-            The talented individuals who brought Opportunity Hub to life
-          </p>
-
-          <div class="team-grid">
-            <!-- Team Leader -->
-            <div class="team-card leader">
-              <div class="member-avatar leader-avatar">BP</div>
-              <div class="member-badge leader-badge">Team Leader</div>
-              <h3 class="member-name">Begli Pirmuhammedov</h3>
-              <p class="member-role">Main Programmer · Full Stack Developer</p>
-              <p class="member-desc">
-                Led the development of both frontend and backend systems, 
-                architecting the entire application structure.
-              </p>
-              <div class="member-skills">
-                <span class="skill-tag">FastAPI</span>
-                <span class="skill-tag">Vue.js</span>
-                <span class="skill-tag">HTML</span>
-                <span class="skill-tag">CSS</span>
-                <span class="skill-tag">Pydantic</span>
-                <span class="skill-tag">SQLAlchemy</span>
-                <span class="skill-tag">Python</span>
-                <span class="skill-tag">JavaScript</span>
-              </div>
-            </div>
-
-            <!-- Frontend Developers -->
-            <div class="team-card">
-              <div class="member-avatar frontend-avatar">JM</div>
-              <div class="member-badge frontend-badge">Frontend</div>
-              <h3 class="member-name">Jabari Myers</h3>
-              <p class="member-role">Frontend Developer</p>
-              <p class="member-desc">
-                Contributed to the user interface design and frontend functionality.
-              </p>
-              <div class="member-skills">
-                <span class="skill-tag">Vue.js</span>
-                <span class="skill-tag">HTML</span>
-                <span class="skill-tag">CSS</span>
-              </div>
-            </div>
-
-            <div class="team-card">
-              <div class="member-avatar frontend-avatar">BP</div>
-              <div class="member-badge frontend-badge">Frontend</div>
-              <h3 class="member-name">Benjamin Popma</h3>
-              <p class="member-role">Frontend Developer</p>
-              <p class="member-desc">
-                Worked on responsive design and interactive components.
-              </p>
-              <div class="member-skills">
-                <span class="skill-tag">Vue.js</span>
-                <span class="skill-tag">HTML</span>
-                <span class="skill-tag">CSS</span>
-              </div>
-            </div>
-
-            <!-- Backend Developers -->
-            <div class="team-card">
-              <div class="member-avatar backend-avatar">KM</div>
-              <div class="member-badge backend-badge">Backend</div>
-              <h3 class="member-name">Kanishaka Madan</h3>
-              <p class="member-role">Backend Developer</p>
-              <p class="member-desc">
-                Developed API endpoints and database functionality.
-              </p>
-              <div class="member-skills">
-                <span class="skill-tag">FastAPI</span>
-                <span class="skill-tag">Python</span>
-              </div>
-            </div>
-
-            <div class="team-card">
-              <div class="member-avatar backend-avatar">NN</div>
-              <div class="member-badge backend-badge">Backend</div>
-              <h3 class="member-name">Nicolai Nunez</h3>
-              <p class="member-role">Backend Developer</p>
-              <p class="member-desc">
-                Contributed to server-side logic and data management.
-              </p>
-              <div class="member-skills">
-                <span class="skill-tag">FastAPI</span>
-                <span class="skill-tag">Python</span>
-              </div>
-            </div>
+          <div class="team-number-card">
+            <div class="team-number-icon">👥</div>
+            <h2 class="team-number-title">Team</h2>
+            <div class="team-number-value">5792</div>
+            <p class="team-number-subtitle">TSA Webmaster {{ year }}</p>
           </div>
         </section>
 
@@ -811,132 +726,46 @@ header{
   margin-bottom:48px;
 }
 
-.team-intro{
-  color:#64748b;
-  margin-bottom:32px;
-  font-size:16px;
-}
-
-.team-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
-  gap:20px;
-}
-
-.team-card{
-  background:var(--card);
-  border-radius:20px;
-  padding:28px;
+.team-number-card{
+  background:linear-gradient(135deg, rgba(37,99,235,.05), rgba(20,184,166,.05));
+  border:2px solid rgba(37,99,235,.2);
+  border-radius:24px;
+  padding:48px 32px;
   text-align:center;
-  border:1px solid rgba(148,163,184,.15);
-  transition:transform 0.2s, box-shadow 0.2s;
+  max-width:500px;
+  margin:0 auto;
+  box-shadow:0 8px 32px rgba(37,99,235,.1);
 }
 
-.team-card:hover{
-  transform:translateY(-4px);
-  box-shadow:0 16px 40px rgba(15,23,42,.08);
-}
-
-.team-card.leader{
-  grid-column:1 / -1;
-  background:linear-gradient(135deg, rgba(37,99,235,.03), rgba(20,184,166,.03));
-  border-color:rgba(37,99,235,.2);
-}
-
-@media (min-width: 768px){
-  .team-card.leader{
-    grid-column:span 1;
-  }
-}
-
-.member-avatar{
-  width:72px;
-  height:72px;
-  border-radius:999px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:24px;
-  font-weight:800;
-  color:#fff;
-  margin:0 auto 12px;
-}
-
-.leader-avatar{
-  background:linear-gradient(135deg, var(--accent), var(--accent-2));
-  width:84px;
-  height:84px;
-  font-size:28px;
-}
-
-.frontend-avatar{
-  background:linear-gradient(135deg, #8b5cf6, #a855f7);
-}
-
-.backend-avatar{
-  background:linear-gradient(135deg, #f59e0b, #ea580c);
-}
-
-.member-badge{
-  display:inline-block;
-  padding:4px 12px;
-  border-radius:999px;
-  font-size:11px;
-  font-weight:700;
-  text-transform:uppercase;
-  letter-spacing:.03em;
-  margin-bottom:12px;
-}
-
-.leader-badge{
-  background:linear-gradient(90deg, var(--accent), var(--accent-2));
-  color:#fff;
-}
-
-.frontend-badge{
-  background:rgba(139,92,246,.15);
-  color:#7c3aed;
-}
-
-.backend-badge{
-  background:rgba(245,158,11,.15);
-  color:#d97706;
-}
-
-.member-name{
-  font-size:18px;
-  font-weight:700;
-  margin-bottom:4px;
-}
-
-.member-role{
-  font-size:13px;
-  color:var(--accent);
-  font-weight:600;
-  margin-bottom:12px;
-}
-
-.member-desc{
-  font-size:13px;
-  color:#64748b;
-  line-height:1.5;
+.team-number-icon{
+  font-size:64px;
   margin-bottom:16px;
+  display:block;
 }
 
-.member-skills{
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
-  gap:6px;
+.team-number-title{
+  font-size:28px;
+  font-weight:700;
+  color:var(--text);
+  margin-bottom:8px;
+  letter-spacing:0.02em;
 }
 
-.skill-tag{
-  padding:4px 10px;
-  border-radius:6px;
-  background:rgba(148,163,184,.1);
-  font-size:11px;
-  font-weight:600;
+.team-number-value{
+  font-size:72px;
+  font-weight:800;
+  background:linear-gradient(135deg, var(--accent), var(--accent-2));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  margin-bottom:12px;
+  letter-spacing:0.05em;
+}
+
+.team-number-subtitle{
+  font-size:16px;
   color:#64748b;
+  font-weight:500;
 }
 
 /* Features Section */
