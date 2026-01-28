@@ -173,6 +173,30 @@
               </div>
             </div>
 
+            <!-- Hosting & Deployment -->
+            <div class="ref-category">
+              <h3 class="category-title">Hosting & Deployment</h3>
+              <div class="ref-list">
+                <a href="https://vercel.com/" target="_blank" rel="noopener" class="ref-card">
+                  <div class="ref-icon vercel-icon">▲</div>
+                  <div class="ref-info">
+                    <h4>Vercel</h4>
+                    <p>Frontend hosting and deployment platform</p>
+                  </div>
+                  <span class="ref-arrow">→</span>
+                </a>
+
+                <a href="https://render.com/" target="_blank" rel="noopener" class="ref-card">
+                  <div class="ref-icon render-icon">🚀</div>
+                  <div class="ref-info">
+                    <h4>Render</h4>
+                    <p>Backend hosting and PostgreSQL database hosting</p>
+                  </div>
+                  <span class="ref-arrow">→</span>
+                </a>
+              </div>
+            </div>
+
             <!-- Styling -->
             <div class="ref-category">
               <h3 class="category-title">Styling & Design</h3>
@@ -695,6 +719,17 @@ header{
 .ref-icon svg{
   width:24px;
   height:24px;
+}
+
+.vercel-icon{
+  font-size:18px;
+  font-weight:900;
+  color:#000;
+  background:linear-gradient(135deg, rgba(0,0,0,.05), rgba(0,0,0,.1));
+}
+
+.render-icon{
+  background:linear-gradient(135deg, rgba(37,99,235,.15), rgba(20,184,166,.15));
 }
 
 .ref-info{
