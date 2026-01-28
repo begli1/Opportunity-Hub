@@ -102,13 +102,28 @@ app.add_middleware(
 
 # Explicit OPTIONS handler as fallback
 @app.options("/{full_path:path}")
-async def options_handler(full_path: str):
-    """Handle OPTIONS requests explicitly"""
+async def options_handler(full_path: str, origin: Optional[str] = Header(None)):
+    """Handle OPTIONS requests explicitly - CORS preflight"""
     from fastapi.responses import Response
+    import re
+    
+    # Check if origin matches allowed patterns
+    allowed = False
+    if origin:
+        # Check against explicit URLs
+        if origin in FRONTEND_URLS:
+            allowed = True
+        # Check against Vercel regex
+        elif re.match(VERCEL_PATTERN, origin):
+            allowed = True
+    
+    if not allowed:
+        return Response(status_code=400)
+    
     return Response(
         status_code=200,
         headers={
-            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Origin": origin if origin else FRONTEND_URLS[0] if FRONTEND_URLS else "*",
             "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD",
             "Access-Control-Allow-Headers": "*",
             "Access-Control-Allow-Credentials": "true",
