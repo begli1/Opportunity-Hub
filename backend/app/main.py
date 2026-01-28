@@ -86,19 +86,35 @@ FRONTEND_URLS = os.environ.get("FRONTEND_URLS", "http://localhost:5173,http://12
 FRONTEND_URLS = [url.strip() for url in FRONTEND_URLS if url.strip()]
 
 # Add Vercel pattern to allow any Vercel deployment (production, preview, etc.)
-# This regex matches: https://*.vercel.app and https://*.vercel.app/*
-VERCEL_PATTERN = r"https://.*\.vercel\.app.*"
+# This regex matches: https://*.vercel.app (with or without trailing slash)
+VERCEL_PATTERN = r"https://.*\.vercel\.app$"
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=FRONTEND_URLS,
     allow_origin_regex=VERCEL_PATTERN,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"],
     allow_headers=["*"],
     expose_headers=["*"],
     max_age=3600,
 )
+
+# Explicit OPTIONS handler as fallback
+@app.options("/{full_path:path}")
+async def options_handler(full_path: str):
+    """Handle OPTIONS requests explicitly"""
+    from fastapi.responses import Response
+    return Response(
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD",
+            "Access-Control-Allow-Headers": "*",
+            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Max-Age": "3600",
+        }
+    )
 
 # =========================
 # DB dependency (async)
