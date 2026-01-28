@@ -85,9 +85,14 @@ app = FastAPI(lifespan=lifespan)
 FRONTEND_URLS = os.environ.get("FRONTEND_URLS", "http://localhost:5173,http://127.0.0.1:5173").split(",")
 FRONTEND_URLS = [url.strip() for url in FRONTEND_URLS if url.strip()]
 
+# Add Vercel pattern to allow any Vercel deployment (production, preview, etc.)
+# This regex matches: https://*.vercel.app and https://*.vercel.app/*
+VERCEL_PATTERN = r"https://.*\.vercel\.app.*"
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=FRONTEND_URLS,
+    allow_origin_regex=VERCEL_PATTERN,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
