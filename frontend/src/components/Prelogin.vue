@@ -214,7 +214,7 @@
         </div>
         <div class="stat">
           <div class="stat-label">Areas covered</div>
-          <div class="stat-value">6</div>
+          <div class="stat-value">4</div>
         </div>
         <div class="stat">
           <div class="stat-label">Built for</div>
