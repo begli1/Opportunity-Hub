@@ -159,6 +159,45 @@
           </div>
         </section>
 
+        <!-- Work Log Section -->
+        <section class="worklog-section">
+          <h2 class="section-title">
+            <span class="section-icon">📄</span>
+            Team Work Log
+          </h2>
+          <div class="worklog-card">
+            <p class="worklog-description">
+              View our detailed work log documenting all team member contributions, hours worked, and tasks completed throughout the development of Opportunity Hub.
+            </p>
+            <div class="worklog-actions">
+              <a 
+                href="/Work log webmaster.pdf" 
+                target="_blank" 
+                class="btn btn-primary worklog-btn"
+              >
+                <span>📄</span>
+                View Work Log PDF
+              </a>
+              <a 
+                href="/Work log webmaster.pdf" 
+                download="Work log webmaster.pdf"
+                class="btn btn-outline worklog-btn"
+              >
+                <span>⬇️</span>
+                Download PDF
+              </a>
+            </div>
+            <div class="worklog-preview">
+              <iframe 
+                src="/Work log webmaster.pdf#toolbar=1" 
+                type="application/pdf"
+                class="pdf-viewer"
+                title="Work Log PDF Preview"
+              ></iframe>
+            </div>
+          </div>
+        </section>
+
         <!-- Features Highlight -->
         <section class="features-section">
           <h2 class="section-title">
@@ -766,6 +805,77 @@ header{
   font-size:16px;
   color:#64748b;
   font-weight:500;
+}
+
+/* Work Log Section */
+.worklog-section{
+  margin-bottom:48px;
+}
+
+.worklog-card{
+  background:var(--card);
+  border-radius:20px;
+  padding:32px;
+  border:1px solid rgba(148,163,184,.15);
+}
+
+.worklog-description{
+  font-size:16px;
+  line-height:1.7;
+  color:#64748b;
+  margin-bottom:24px;
+  text-align:center;
+}
+
+.worklog-actions{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:24px;
+}
+
+.worklog-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  text-decoration:none;
+}
+
+.worklog-preview{
+  width:100%;
+  height:600px;
+  border-radius:12px;
+  overflow:hidden;
+  border:1px solid rgba(148,163,184,.2);
+  background:#f9fafb;
+}
+
+.pdf-viewer{
+  width:100%;
+  height:100%;
+  border:none;
+}
+
+@media (max-width: 768px){
+  .worklog-preview{
+    height:500px;
+  }
+}
+
+@media (max-width: 480px){
+  .worklog-preview{
+    height:400px;
+  }
+  
+  .worklog-actions{
+    flex-direction:column;
+  }
+  
+  .worklog-btn{
+    width:100%;
+    justify-content:center;
+  }
 }
 
 /* Features Section */
