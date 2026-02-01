@@ -110,7 +110,7 @@
 
     <div class="section-header">
       <h2>Your Posts</h2>
-      <span class="muted small-text">Manage your opportunities and applicants.</span>
+      <span class="muted small-text">Manage your community resource posts.</span>
     </div>
 
     <div v-if="loading" class="muted small-text" style="padding: 0 20px;">Loading…</div>

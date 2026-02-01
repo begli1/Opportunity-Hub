@@ -136,7 +136,7 @@
             <p class="welcome-eyebrow">Welcome back,</p>
             <h1 class="welcome-title">{{ userName }}</h1>
             <p class="welcome-sub">
-              Here’s what’s happening in your opportunity hub today.
+              Here’s what’s happening in your community resource hub today.
             </p>
           </div>
 
@@ -181,7 +181,7 @@
 
             <!-- Trending -->
             <div class="section-header">
-              <h2>Trending opportunities</h2>
+              <h2>Featured Community Resources</h2>
               <span class="muted small-text">
                 Based on what students around you are viewing
               </span>
@@ -313,7 +313,7 @@
             <router-link to="/references" class="pill">References</router-link>
             <button class="pill" type="button" @click="openPrivacy">Privacy</button>
             <button class="pill" type="button" @click="openContact">Contact</button>
-            <button class="pill" type="button" @click="openPost">Post an opportunity</button>
+            <button class="pill" type="button" @click="openPost">Post a community resource</button>
           </div>
         </div>
       </div>
@@ -402,7 +402,7 @@
     <!-- Post Modal -->
     <div v-if="isPostOpen" class="modal-backdrop" @click.self="closePost">
       <div class="modal">
-        <h3>Create opportunity</h3>
+        <h3>Add community resource</h3>
 
         <div class="form-row">
           <label>Type</label>
@@ -598,7 +598,7 @@
         <div class="form-row">
           <label class="row-inline">
             <input type="checkbox" v-model="advanced.onlyExternalApply" />
-            Only show opportunities with external apply link
+            Only show community resources with external apply link
           </label>
         </div>
 

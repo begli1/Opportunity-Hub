@@ -110,7 +110,7 @@
 
     <div class="section-header">
       <h2>My Applications</h2>
-      <span class="muted small-text">Track decisions on the opportunities you applied to.</span>
+      <span class="muted small-text">Track decisions on community resources you applied to.</span>
 
 
       <div v-if="loading" class="muted small-text" style="padding: 0 20px;">

@@ -91,6 +91,7 @@
         <nav class="mobile-nav" :class="{ active: isMenuOpen }">
           <a href="#about" @click="closeMenu">About</a>
           <a href="#areas" @click="closeMenu">Areas</a>
+          <a href="#community-orgs" @click="closeMenu">Community</a>
           <a href="#how" @click="closeMenu">How it works</a>
           <a href="#faq" @click="closeMenu">FAQ</a>
           <RouterLink to="/about" @click="closeMenu">About Us</RouterLink>
@@ -107,15 +108,18 @@
       <!-- HERO -->
       <section class="hero">
         <div class="hero-copy">
-          <span class="badge">Student Opportunity Hub</span>
+          <span class="badge">Student Community Resource Hub</span>
           <h1>All your internships, clubs, and tutoring in one place.</h1>
           <p>
-            Search real opportunities filtered by grade, interest, and time
+            Opportunity Hub is a community resource hub designed for students—a vital subgroup of the local community—providing centralized access to educational, career, and service-oriented resources.
+          </p>
+          <p>
+            Search real community resources filtered by grade, interest, and time
             commitment. Built by students, for students.
           </p>
 
           <ul class="hero-points">
-            <li>Verified listings only</li>
+            <li>Verified community resources only</li>
             <li>Smart filters and saved favorites</li>
             <li>Free accounts for students and educators</li>
           </ul>
@@ -130,7 +134,7 @@
           </div>
 
           <p class="muted hero-subnote">
-            No credit card. No spam. Log in any time to see full listings.
+            No credit card. No spam. Log in any time to see full community resources.
           </p>
         </div>
 
@@ -201,7 +205,7 @@
           </div>
 
           <p class="muted hero-panel-footer">
-            Log in to see real listings, deadlines, and application links.
+            Log in to see full community resources, deadlines, and application links.
           </p>
         </div>
       </section>
@@ -209,7 +213,7 @@
       <!-- STATS STRIP -->
       <section class="stats">
         <div class="stat">
-          <div class="stat-label">Opportunities in the hub</div>
+          <div class="stat-label">Community Resources in the hub</div>
           <div class="stat-value">120+</div>
         </div>
         <div class="stat">
@@ -259,8 +263,8 @@
       <section id="areas" class="panel section-gap" aria-labelledby="areas-title">
         <div class="section-header">
           <div>
-            <span class="kicker">Areas we cover</span>
-            <h2 id="areas-title">Pick your path</h2>
+            <span class="kicker">Community Resources</span>
+            <h2 id="areas-title">Community Programs for Students</h2>
             <p class="muted">
               These are the main sections you’ll find once you log in.
             </p>
@@ -353,12 +357,12 @@
             </summary>
             <p class="muted">
               You can see how the Hub works and browse example cards.
-              Real listings and application links appear after you create a free account.
+              Full community resources and application links appear after you create a free account.
             </p>
           </details>
           <details class="faq-item">
             <summary class="muted">
-              <strong>Do I need an account to see real opportunities?</strong>
+              <strong>Do I need an account to see community resources?</strong>
             </summary>
             <p class="muted">
               Yes. A free account lets you view the full directory, save favorites,
@@ -378,13 +382,13 @@
               <strong>Who can use the Hub?</strong>
             </summary>
             <p class="muted">
-              High-school students and educators. Some listings may be regional
+              High-school students and educators. Some community resources may be regional
               or have age or grade requirements.
             </p>
           </details>
           <details class="faq-item">
             <summary class="muted">
-              <strong>Where do listings come from?</strong>
+              <strong>Where do community resources come from?</strong>
             </summary>
             <p class="muted">
               From verified organizations, schools, and club leaders.
@@ -393,10 +397,10 @@
           </details>
           <details class="faq-item">
             <summary class="muted">
-              <strong>Can I post an opportunity?</strong>
+              <strong>Can I add a community resource?</strong>
             </summary>
             <p class="muted">
-              Yes. After creating an account, you will see a “Post an opportunity” button
+              Yes. After creating an account, you will see a “Post a community resource” button
               with a short form.
             </p>
           </details>

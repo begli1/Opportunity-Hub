@@ -59,7 +59,7 @@
           <div class="hero-badge">TSA Webmaster {{ year }}</div>
           <h1 class="hero-title">About Opportunity Hub</h1>
           <p class="hero-subtitle">
-            Connecting students with the opportunities that shape their future
+            Connecting students with community resources that shape their future
           </p>
         </section>
 
@@ -69,13 +69,16 @@
             <div class="mission-icon">🎯</div>
             <h2>Our Mission</h2>
             <p class="mission-text">
+              Opportunity Hub is a community resource hub for students. We treat students as a vital subgroup of the local community and provide centralized access to educational, career, and service-oriented resources—including internships, tutoring, clubs, and volunteering.
+            </p>
+            <p class="mission-text">
               Opportunity Hub was created to solve a common problem students face: 
-              <strong>finding the right opportunities shouldn't require visiting dozens of different websites.</strong>
+              <strong>finding the right community resources shouldn't require visiting dozens of different websites.</strong>
             </p>
             <p class="mission-text">
               We believe every student deserves easy access to clubs, internships, volunteering positions, 
-              and tutoring opportunities—all in one place. Our platform serves as a centralized hub where 
-              students can discover, explore, and apply to opportunities that match their interests and goals.
+              and tutoring—all in one place. Our platform serves as a centralized hub where 
+              students can discover, explore, and apply to community resources that match their interests and goals.
             </p>
           </div>
         </section>
@@ -89,7 +92,7 @@
                 <h3>The Problem</h3>
               </div>
               <ul class="problem-list">
-                <li>Students struggle to find relevant opportunities</li>
+                <li>Students struggle to find relevant community resources</li>
                 <li>Information is scattered across multiple websites</li>
                 <li>School clubs are often poorly advertised</li>
                 <li>No centralized system for internships and volunteering</li>
@@ -106,7 +109,7 @@
                 <li>One platform for all student opportunities</li>
                 <li>Easy search and filter by type, location, tags</li>
                 <li>Direct in-app applications</li>
-                <li>Save and track opportunities you're interested in</li>
+                <li>Save and track community resources you're interested in</li>
                 <li>AI-powered content moderation for safety</li>
               </ul>
             </div>
@@ -208,7 +211,7 @@
             <div class="feature-card">
               <span class="feature-icon">🔍</span>
               <h4>Smart Search</h4>
-              <p>Find opportunities by type, location, or keywords</p>
+              <p>Find community resources by type, location, or keywords</p>
             </div>
             <div class="feature-card">
               <span class="feature-icon">📝</span>
@@ -301,7 +304,7 @@
         <!-- Call to Action -->
         <section class="cta-section">
           <div class="cta-card">
-            <h2>Ready to explore opportunities?</h2>
+            <h2>Ready to explore community resources?</h2>
             <p>Join Opportunity Hub and discover what's waiting for you.</p>
             <div class="cta-buttons">
               <router-link to="/signup" class="btn btn-cta-primary">Get Started</router-link>
