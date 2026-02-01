@@ -69,7 +69,7 @@
             <div class="mission-icon">🎯</div>
             <h2>Our Mission</h2>
             <p class="mission-text">
-              Opportunity Hub is a community resource hub for students. We treat students as a vital subgroup of the local community and provide centralized access to educational, career, and service-oriented resources—including internships, tutoring, clubs, and volunteering.
+              Opportunity Hub is a community resource hub for students. We treat students as a vital subgroup of the local community and provide centralized access to educational, career, and service-oriented resources—including internships, tutoring, clubs, and volunteering. Students are residents of the local community, and this hub connects them with programs and organizations that serve youth.
             </p>
             <p class="mission-text">
               Opportunity Hub was created to solve a common problem students face: 

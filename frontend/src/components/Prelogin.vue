@@ -217,7 +217,7 @@
           <div class="stat-value">120+</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Areas covered</div>
+          <div class="stat-label">Resource Categories</div>
           <div class="stat-value">4</div>
         </div>
         <div class="stat">
