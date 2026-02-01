@@ -373,6 +373,24 @@
             </div>
           </div>
         </section>
+
+        <!-- Images & Credits -->
+        <section class="ref-section">
+          <h2 class="section-title">
+            <span class="section-icon">🖼️</span>
+            Images & Credits
+          </h2>
+          
+          <div class="docs-list">
+            <a href="https://www.istockphoto.com/photo/business-opportunity-gm530977027-54989242" target="_blank" rel="noopener" class="doc-link">
+              <span class="doc-name">Login & Signup background image — "Business Opportunity"</span>
+              <span class="doc-url">iStock / Getty Images</span>
+            </a>
+          </div>
+          <p class="muted small-text" style="margin-top: 12px;">
+            Background image used on the Login and Signup pages. Licensed from iStock by Getty Images.
+          </p>
+        </section>
       </div>
     </main>
 
