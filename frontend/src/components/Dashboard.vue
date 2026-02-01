@@ -264,7 +264,7 @@
               <h3>Quick actions</h3>
               <div class="sidebar-actions">
                 <button class="btn btn-primary w-full" type="button" @click="openPost">
-                  + Post an opportunity
+                  + Add a community resource
                 </button>
 
                 <button class="btn btn-outline w-full" type="button" @click="quickFilter('tutor')">
