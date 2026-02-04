@@ -506,8 +506,13 @@ async def moderate_opportunity_after_create(opportunity_id: int, payload_dict: d
 
 
 # =========================
-# Health
+# Root + Health (avoid 405 on GET / from Render/browsers)
 # =========================
+@app.get("/")
+async def root():
+    return {"message": "Opportunity Hub API", "docs": "/docs", "health": "/health"}
+
+
 @app.get("/health")
 async def health():
     return {"status": "ok"}
