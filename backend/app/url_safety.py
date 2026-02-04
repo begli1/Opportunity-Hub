@@ -14,26 +14,113 @@ BLOCKED_SCHEMES = frozenset({
 ALLOWED_SCHEMES = frozenset({"http", "https"})
 
 # Common job/application domains (lowercase, no port). Extend as needed.
+# Common student / internship / volunteering / tutoring platforms
+# Lowercase, no ports. Use suffix matching in code (endswith check).
+
 ALLOWLIST_DOMAINS = frozenset({
+
+    # ===== Professional / Job / Internship Platforms =====
     "linkedin.com", "www.linkedin.com",
     "indeed.com", "www.indeed.com",
     "glassdoor.com", "www.glassdoor.com",
-    "google.com", "www.google.com", "docs.google.com", "forms.google.com",
-    "applytojob.com", "jobs.lever.co", "lever.co",
-    "greenhouse.io", "boards.greenhouse.io",
-    "workday.com", "myworkdayjobs.com",
-    "smartrecruiters.com", "www.smartrecruiters.com",
     "ziprecruiter.com", "www.ziprecruiter.com",
     "monster.com", "www.monster.com",
     "careerbuilder.com", "www.careerbuilder.com",
+
+    "handshake.com", "www.handshake.com",
+    "app.joinhandshake.com", "joinhandshake.com",
+
+    "apply.workable.com", "workable.com",
+    "jobs.lever.co", "lever.co",
+    "greenhouse.io", "boards.greenhouse.io",
+    "smartrecruiters.com", "www.smartrecruiters.com",
+
+    "myworkdayjobs.com", "workday.com",
+    "icims.com", "careers.icims.com",
+
+    # ===== Government / Public Programs =====
     "usajobs.gov", "www.usajobs.gov",
+    "intern.usajobs.gov",
+    "nsf.gov", "www.nsf.gov",
+    "nih.gov", "www.nih.gov",
+    "nasa.gov", "www.nasa.gov",
+    "usa.gov", "www.usa.gov",
+
+    # ===== Research / Academic / Summer Programs =====
+    "nsf.org",
+    "pathwaystoscience.org",
+    "research.gov",
+    "sciencepathways.org",
+
+    "summerapply.com",
+    "apply.commonapp.org",
+    "commonapp.org",
+
+    "collegeboard.org", "www.collegeboard.org",
+    "ets.org", "www.ets.org",
+
+    # ===== Volunteering / Nonprofit Platforms =====
+    "volunteermatch.org", "www.volunteermatch.org",
     "idealist.org", "www.idealist.org",
-    "handshake.com", "www.handshake.com", "app.joinhandshake.com",
-    "typeform.com", "www.typeform.com", "form.typeform.com",
-    "airtable.com", "www.airtable.com",
+    "catchafire.org", "www.catchafire.org",
+    "justserve.org", "www.justserve.org",
+    "points-of-light.org", "www.pointsoflight.org",
+
+    "redcross.org", "www.redcross.org",
+    "habitat.org", "www.habitat.org",
+    "ymca.org", "www.ymca.org",
+    "unitedway.org", "www.unitedway.org",
+
+    # ===== Tutoring / Education / Mentoring =====
+    "chegg.com", "www.chegg.com",
+    "wyzant.com", "www.wyzant.com",
+    "care.com", "www.care.com",
+
+    "tutor.com", "www.tutor.com",
+    "skooli.com", "www.skooli.com",
+    "varsitytutors.com", "www.varsitytutors.com",
+
+    "khanacademy.org", "www.khanacademy.org",
+    "coursera.org", "www.coursera.org",
+    "edx.org", "www.edx.org",
+    "udemy.com", "www.udemy.com",
+
+    # ===== Forms / Applications / Data Collection =====
+    "google.com", "www.google.com",
+    "docs.google.com", "forms.google.com",
+
+    "typeform.com", "form.typeform.com",
     "jotform.com", "www.jotform.com",
-    "typeform.com", "apply.workable.com", "workable.com",
+
+    "airtable.com", "www.airtable.com",
+    "notion.so", "www.notion.so",
+
+    # ===== Fellowship / Youth / Leadership Programs =====
+    "scholarships.com", "www.scholarships.com",
+    "fastweb.com", "www.fastweb.com",
+    "cheggscholarships.com",
+
+    "civicsunplugged.org",
+    "rise.org",
+    "questbridge.org", "www.questbridge.org",
+
+    "jackierobinson.org",
+    "thurgoodmarshallfund.org",
+
+    # ===== Tech / Startup Internships =====
+    "ycombinator.com", "www.ycombinator.com",
+    "angel.co", "wellfound.com",
+    "internshala.com",
+
+    # ===== Nonprofit / International Orgs =====
+    "un.org", "www.un.org",
+    "unicef.org", "www.unicef.org",
+    "who.int", "www.who.int",
+
+    "peacecorps.gov", "www.peacecorps.gov",
+
 })
+
 
 
 def _normalize_host(host: str) -> str:
