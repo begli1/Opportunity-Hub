@@ -977,6 +977,28 @@ async function toggleSave(id) {
   }
 }
 
+// Turn API validation errors into user-friendly messages for the post form
+function formatPostError(e) {
+  const detail = e?.response?.data?.detail
+  if (Array.isArray(detail) && detail.length > 0) {
+    const first = detail[0]
+    const loc = first.loc || []
+    const msg = (first.msg || '').toLowerCase()
+    const field = loc[loc.length - 1]
+    if (field === 'contact_email' || msg.includes('email')) {
+      return 'Please enter a valid email address for Contact email.'
+    }
+    if (field === 'title') return 'Please enter a title.'
+    if (field === 'org') return 'Please enter an organization name.'
+    if (field === 'description') return 'Please enter a description.'
+    if (field === 'location') return 'Please enter a location.'
+    if (first.msg) return first.msg
+  }
+  if (typeof detail === 'object' && detail?.message) return detail.message
+  if (typeof detail === 'string') return detail
+  return e?.message || 'Failed to post. Please check your entries and try again.'
+}
+
 // submit post
 async function submitPost() {
   postError.value = ''
@@ -1064,11 +1086,7 @@ async function submitPost() {
         } catch {}
       }
 
-      postError.value =
-        e?.response?.data?.detail?.message ||
-        e?.response?.data?.detail ||
-        e?.message ||
-        'Failed to post'
+      postError.value = formatPostError(e)
 
   } finally {
     isPosting.value = false

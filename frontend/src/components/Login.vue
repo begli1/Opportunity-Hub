@@ -125,6 +125,7 @@ if (!errorMessage.value) {
         />
       </div>
 
+      <p class="forgot-link"><RouterLink to="/forgot-password">Forgot password?</RouterLink></p>
       <p>New here? <RouterLink to="/signup">Sign up</RouterLink></p>
       <button type="submit" :disabled="submitting">{{ submitting ? 'Logging in…' : 'Log In' }}</button>
     </form>
@@ -233,6 +234,7 @@ form button:active{
 
 /* links */
 p{ color:#64748b; font-size:13px; }
+.forgot-link{ margin-top:4px; }
 a{ text-decoration:none; color:var(--accent); font-weight:600; }
 a:hover{ text-decoration:underline; }
 

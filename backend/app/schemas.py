@@ -55,6 +55,19 @@ class Token(BaseModel):
     expires_in: int  # seconds until expiry
 
 
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class ForgotPasswordResponse(BaseModel):
+    message: str
+    reset_link: Optional[str] = None  # Only set in dev when SEND_RESET_LINK_IN_RESPONSE=true
+
+
+class ResetPasswordRequest(BaseModel):
+    token: str = Field(..., min_length=1)
+    new_password: str = Field(..., min_length=8)
+
 
 class OpportunityOut(BaseModel):
     id: int

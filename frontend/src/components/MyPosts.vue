@@ -321,14 +321,18 @@
           <input v-model="editTags" placeholder="python, cybersecurity, beginner-friendly" />
         </div>
 
-        <div class="form-row" style="display:flex; gap: 12px; align-items:center;">
-          <input id="allowApply" type="checkbox" v-model="editForm.allow_apply" />
-          <label for="allowApply" style="margin: 0;">Allow applications</label>
+        <div class="form-row">
+          <label class="row-inline">
+            <input type="checkbox" v-model="editForm.allow_apply" />
+            Allow applications
+          </label>
         </div>
 
-        <div class="form-row" style="display:flex; gap: 12px; align-items:center;">
-          <input id="allowExternal" type="checkbox" v-model="editForm.allow_external_apply" />
-          <label for="allowExternal" style="margin: 0;">Allow external apply link</label>
+        <div class="form-row">
+          <label class="row-inline">
+            <input type="checkbox" v-model="editForm.allow_external_apply" />
+            Allow external apply link
+          </label>
         </div>
 
         <div class="form-row" v-if="editForm.allow_external_apply">
@@ -1598,6 +1602,20 @@ footer{
 .modal textarea:focus{
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--ring);
+}
+
+.form-row .row-inline{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.form-row .row-inline input[type="checkbox"]{
+  width: auto;
+  margin: 0;
+  cursor: pointer;
+  accent-color: var(--accent);
 }
 
 .modal textarea{
