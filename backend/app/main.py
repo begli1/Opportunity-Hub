@@ -4,7 +4,6 @@ from typing import Annotated, Optional, List
 from contextlib import asynccontextmanager
 import os
 import hashlib
-import secrets
 from .schemas import OpportunityCreate
 from fastapi import FastAPI, Depends, HTTPException, status, Header, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,7 +16,7 @@ from sqlalchemy import select, func, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import update
-from .models import engine, async_session, Base, User, Opportunity, SavedOpportunity, Application, Report, RateLimit, ModerationLinkOpen, PasswordResetToken
+from .models import engine, async_session, Base, User, Opportunity, SavedOpportunity, Application, Report, RateLimit, ModerationLinkOpen
 import re
 import string
 import json
@@ -54,8 +53,6 @@ load_dotenv()
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev_only_change_me")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES", "15"))
-RESET_PASSWORD_EXPIRE_MINUTES = int(os.environ.get("RESET_PASSWORD_EXPIRE_MINUTES", "60"))
-SEND_RESET_LINK_IN_RESPONSE = os.environ.get("SEND_RESET_LINK_IN_RESPONSE", "false").strip().lower() in ("true", "1", "yes")
 MODERATOR_EMAILS = {e.strip().lower() for e in os.environ.get("MODERATOR_EMAILS", "").split(",") if e.strip()}
 def require_moderator(user: User) -> None:
     # If MODERATOR_EMAILS is empty, lock moderation down (nobody is moderator)
@@ -556,68 +553,6 @@ async def login(payload: LoginByEmail, db: DbDep):
 
     access_token, expires_in = create_access_token_for_user_id(user.id)
     return {"access_token": access_token, "token_type": "bearer", "expires_in": expires_in}
-
-
-def _hash_reset_token(token: str) -> str:
-    return hashlib.sha256(token.encode("utf-8")).hexdigest()
-
-
-@app.post("/auth/forgot-password", response_model=ForgotPasswordResponse)
-async def forgot_password(body: ForgotPasswordRequest, db: DbDep):
-    """Request a password reset. Always returns success to avoid user enumeration."""
-    email_norm = body.email.strip().lower()
-    user = await get_user_by_email(db, email_norm)
-    now = datetime.now(timezone.utc)
-    message = "If an account exists with that email, you will receive a link to reset your password."
-    reset_link = None
-
-    if user:
-        raw_token = secrets.token_urlsafe(32)
-        token_hash = _hash_reset_token(raw_token)
-        expires_at = now + timedelta(minutes=RESET_PASSWORD_EXPIRE_MINUTES)
-        prt = PasswordResetToken(
-            user_id=user.id,
-            token_hash=token_hash,
-            expires_at=expires_at,
-        )
-        db.add(prt)
-        await db.commit()
-
-        base_url = os.environ.get("RESET_PASSWORD_BASE_URL", "").strip() or (FRONTEND_URLS[0] if FRONTEND_URLS else "http://localhost:5173")
-        reset_link = f"{base_url.rstrip('/')}/reset-password?token={raw_token}"
-        if SEND_RESET_LINK_IN_RESPONSE:
-            reset_link = reset_link  # include in response below
-
-    out = {"message": message}
-    if user and SEND_RESET_LINK_IN_RESPONSE and reset_link:
-        out["reset_link"] = reset_link
-    return out
-
-
-@app.post("/auth/reset-password")
-async def reset_password(body: ResetPasswordRequest, db: DbDep):
-    """Set new password using a valid reset token."""
-    token_hash = _hash_reset_token(body.token)
-    now = datetime.now(timezone.utc)
-    res = await db.execute(
-        select(PasswordResetToken)
-        .where(PasswordResetToken.token_hash == token_hash)
-        .where(PasswordResetToken.used_at.is_(None))
-        .where(PasswordResetToken.expires_at > now)
-    )
-    prt = res.scalar_one_or_none()
-    if not prt:
-        raise HTTPException(
-            status_code=400,
-            detail={"code": "INVALID_OR_EXPIRED_TOKEN", "message": "This reset link is invalid or has expired. Please request a new one."},
-        )
-    user = await get_user_by_id(db, prt.user_id)
-    if not user:
-        raise HTTPException(status_code=400, detail={"code": "INVALID_OR_EXPIRED_TOKEN", "message": "Invalid reset link."})
-    user.password_hash = hash_password(body.new_password)
-    prt.used_at = now
-    await db.commit()
-    return {"message": "Password has been reset. You can now log in with your new password."}
 
 
 @app.get("/users/me", response_model=UserOut)

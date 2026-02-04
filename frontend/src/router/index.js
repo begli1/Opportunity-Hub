@@ -1,9 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import PreLogin from '@/components/Prelogin.vue'
 import Login from '@/components/Login.vue'
-import Signup from '@/components/Signup.vue'
-import ForgotPassword from '@/components/ForgotPassword.vue'
-import ResetPassword from '@/components/ResetPassword.vue' 
+import Signup from '@/components/Signup.vue' 
 import Dashboard from '@/components/Dashboard.vue'
 import MyPosts from '@/components/MyPosts.vue'
 import Applications from '@/components/Applications.vue'
@@ -17,8 +15,6 @@ const routes = [
   { path: '/', component: PreLogin },
   { path: '/login', component: Login },
   { path: '/signup', component: Signup },
-  { path: '/forgot-password', component: ForgotPassword },
-  { path: '/reset-password', component: ResetPassword },
   { path: '/about', component: AboutUs },
   { path: '/references', component: References },
   { 
