@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 import os
 import hashlib
 from .schemas import OpportunityCreate
-from fastapi import FastAPI, Depends, HTTPException, status, Header, Query
+from fastapi import FastAPI, Depends, HTTPException, status, Header, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from jose import jwt, JWTError
 from jose.exceptions import ExpiredSignatureError
@@ -16,9 +16,12 @@ from sqlalchemy import select, func, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import update
-from .models import engine, async_session, Base, User, Opportunity, SavedOpportunity, Application, Report, RateLimit
+from .models import engine, async_session, Base, User, Opportunity, SavedOpportunity, Application, Report, RateLimit, ModerationLinkOpen
 import re
 import string
+import json
+from urllib.parse import urlparse
+from . import url_safety
 
 from .schemas import (
     UserCreate,
@@ -35,6 +38,7 @@ from .schemas import (
     OpportunityUpdate, MyOpportunityOut, ApplicationDecisionIn, MyApplicationItem, ReportCreate,
     AppealCreate, AppealDecision, AppealItem, ReportedOpportunityItem, ReportItem, ReportDecision,
     ExternalUrlItem, ExternalUrlDecision, ContactCreate,
+    LinkInfoOut, OpenInSandboxAction, OpenInSandboxOut,
 )
 from openai import OpenAI
 import anyio
@@ -1654,6 +1658,92 @@ async def decide_external_url(
 
     await db.commit()
     return {"ok": True, "approved": payload.approved}
+
+
+def _get_link_info_for_opportunity(opp: Opportunity) -> tuple[str, str, bool, bool, str, list]:
+    """Validate, normalize, and compute risk. Returns (normalized_url, host, is_https, allowlisted, risk_level, reasons). Raises HTTPException on invalid URL."""
+    raw = (opp.external_apply_url or "").strip()
+    if not raw:
+        raise HTTPException(status_code=400, detail={"code": "NO_EXTERNAL_URL", "message": "This opportunity has no external URL"})
+    normalized, err = url_safety.validate_and_normalize_url(raw)
+    if err:
+        raise HTTPException(status_code=400, detail={"code": "INVALID_URL", "message": err})
+    risk_level, allowlisted, reasons = url_safety.compute_risk(normalized)
+    parsed = urlparse(normalized)
+    host = (parsed.netloc or "").split(":")[0].lower()
+    is_https = (parsed.scheme or "").lower() == "https"
+    return normalized, host, is_https, allowlisted, risk_level, reasons
+
+
+@app.get("/moderation/external-urls/{opportunity_id}/link-info", response_model=LinkInfoOut)
+async def get_external_url_link_info(
+    opportunity_id: int,
+    db: DbDep,
+    current_user: CurrentUser,
+):
+    """Return validated/normalized URL and risk info for display in modal. No logging."""
+    require_moderator(current_user)
+    opp = (await db.execute(
+        select(Opportunity).where(Opportunity.id == opportunity_id)
+    )).scalar_one_or_none()
+    if opp is None:
+        raise HTTPException(status_code=404, detail={"code": "NOT_FOUND", "message": "Opportunity not found"})
+    normalized, host, is_https, allowlisted, risk_level, reasons = _get_link_info_for_opportunity(opp)
+    return LinkInfoOut(
+        normalized_url=normalized,
+        host=host,
+        is_https=is_https,
+        allowlisted=allowlisted,
+        risk_level=risk_level,
+        reasons=reasons,
+    )
+
+
+@app.post("/moderation/external-urls/{opportunity_id}/open-in-sandbox", response_model=OpenInSandboxOut, status_code=200)
+async def open_external_url_in_sandbox(
+    opportunity_id: int,
+    payload: OpenInSandboxAction,
+    request: Request,
+    db: DbDep,
+    current_user: CurrentUser,
+):
+    """
+    Safe External Link Review: validate/normalize URL, log action (open or copy), return safe payload.
+    Only http/https allowed; dangerous schemes refused. Frontend opens normalized_url in new tab or copies to clipboard.
+    """
+    require_moderator(current_user)
+    opp = (await db.execute(
+        select(Opportunity).where(Opportunity.id == opportunity_id)
+    )).scalar_one_or_none()
+    if opp is None:
+        raise HTTPException(status_code=404, detail={"code": "NOT_FOUND", "message": "Opportunity not found"})
+    normalized, host, is_https, allowlisted, risk_level, reasons = _get_link_info_for_opportunity(opp)
+    action = payload.action.upper()  # OPEN or COPY
+    user_agent = (request.headers.get("user-agent") or "")[:500]
+    client_host = request.client.host if request.client else None
+    if client_host and len(client_host) > 45:
+        client_host = client_host[:45]
+    log_entry = ModerationLinkOpen(
+        opportunity_id=opp.id,
+        moderator_user_id=current_user.id,
+        action=action,
+        normalized_url=normalized,
+        host=host,
+        risk_level=risk_level,
+        reasons=json.dumps(reasons) if reasons else None,
+        user_agent=user_agent or None,
+        ip=client_host,
+    )
+    db.add(log_entry)
+    await db.commit()
+    return OpenInSandboxOut(
+        normalized_url=normalized,
+        host=host,
+        is_https=is_https,
+        allowlisted=allowlisted,
+        risk_level=risk_level,
+        reasons=reasons,
+    )
 
 
 # =========================

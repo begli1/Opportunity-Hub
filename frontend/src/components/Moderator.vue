@@ -295,14 +295,28 @@
 
           <div class="link-url-box">
             <span class="link-label">External Application URL:</span>
-            <a 
-              :href="link.external_apply_url" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              class="link-url"
-            >
-              {{ link.external_apply_url }}
-            </a>
+            <span class="link-url-plain" :title="link.external_apply_url">{{ link.external_apply_url }}</span>
+            <p class="link-warning-note muted small-text">
+              User-submitted links are shown as text only. Use "Open (logged)" or "Copy URL (logged)" below; both actions are logged.
+            </p>
+            <div class="link-action-buttons">
+              <button
+                type="button"
+                class="btn btn-outline small-btn"
+                :disabled="decidingId === link.id || sandboxCopyId === link.id"
+                @click="copyUrlLogged(link)"
+              >
+                {{ sandboxCopyId === link.id ? 'Copied' : 'Copy URL (logged)' }}
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline small-btn open-sandbox-btn"
+                :disabled="decidingId === link.id || sandboxOpeningId === link.id"
+                @click="openSandboxModal(link)"
+              >
+                {{ sandboxOpeningId === link.id ? 'Opening…' : 'Open (logged)' }}
+              </button>
+            </div>
           </div>
 
           <p class="op-desc">{{ link.description }}</p>
@@ -358,6 +372,52 @@
             @click="confirmDeny"
           >
             Deny Appeal
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Open (logged) Modal – Safe External Link Review -->
+    <div v-if="isSandboxModalOpen" class="modal-backdrop" @click.self="closeSandboxModal">
+      <div class="modal" style="max-width: 540px;">
+        <h3>Open link (logged)</h3>
+        <p class="muted small-text">
+          This link was submitted by a user and may be unsafe. Opens in a new tab with no referrer; use a VM or separate browser profile for full safety.
+        </p>
+        <p v-if="sandboxLinkInfo" class="sandbox-url-display">{{ sandboxLinkInfo.normalized_url }}</p>
+        <div v-if="sandboxLinkInfo" class="sandbox-risk-row">
+          <span class="risk-badge" :class="'risk-' + sandboxLinkInfo.risk_level">{{ sandboxLinkInfo.risk_level }}</span>
+          <span v-if="sandboxLinkInfo.allowlisted" class="allowlist-tag">Allowlisted domain</span>
+          <ul v-if="sandboxLinkInfo.reasons?.length" class="risk-reasons muted small-text">
+            <li v-for="r in sandboxLinkInfo.reasons" :key="r">{{ r }}</li>
+          </ul>
+        </div>
+        <p class="muted small-text" style="margin-top: 8px;">
+          Opening or copying will be <strong>logged</strong> for audit. Do not enter credentials or sensitive data on the opened page.
+        </p>
+        <div v-if="sandboxLinkInfo && sandboxLinkInfo.risk_level === 'HIGH'" class="form-row">
+          <label class="row-inline">
+            <input type="checkbox" v-model="sandboxHighRiskAck" />
+            I understand the risks and will open only in a safe environment
+          </label>
+        </div>
+        <div class="op-actions" style="margin-top: 16px;">
+          <button class="btn btn-ghost small-btn" type="button" @click="closeSandboxModal">Cancel</button>
+          <button
+            class="btn btn-outline small-btn"
+            type="button"
+            :disabled="sandboxOpeningId !== null || sandboxCopyingInModal"
+            @click="copyUrlInModal"
+          >
+            {{ sandboxCopyingInModal ? 'Copied' : 'Copy URL (logged)' }}
+          </button>
+          <button
+            class="btn btn-primary small-btn"
+            type="button"
+            :disabled="sandboxOpeningId !== null || (sandboxLinkInfo && sandboxLinkInfo.risk_level === 'HIGH' && !sandboxHighRiskAck)"
+            @click="confirmOpenInSandbox"
+          >
+            {{ sandboxOpeningId ? 'Opening…' : 'Open (logged)' }}
           </button>
         </div>
       </div>
@@ -469,6 +529,107 @@ function closeDenyModal() {
   isDenyModalOpen.value = false
   denyOp.value = null
   denyResponse.value = ''
+}
+
+/* open (logged) / copy (logged) – safe external link review */
+const isSandboxModalOpen = ref(false)
+const sandboxLink = ref(null)
+const sandboxLinkInfo = ref(null)
+const sandboxOpeningId = ref(null)
+const sandboxCopyId = ref(null)
+const sandboxCopyingInModal = ref(false)
+const sandboxHighRiskAck = ref(false)
+
+async function openSandboxModal(link) {
+  sandboxLink.value = link
+  sandboxLinkInfo.value = null
+  sandboxOpeningId.value = null
+  sandboxHighRiskAck.value = false
+  isSandboxModalOpen.value = true
+  try {
+    const res = await AxiosInstance.get(`/moderation/external-urls/${link.id}/link-info`)
+    sandboxLinkInfo.value = res.data
+  } catch (e) {
+    pageError.value =
+      e?.response?.data?.detail?.message ||
+      e?.response?.data?.detail ||
+      e?.message ||
+      'Could not load link info'
+    closeSandboxModal()
+  }
+}
+
+function closeSandboxModal() {
+  isSandboxModalOpen.value = false
+  sandboxLink.value = null
+  sandboxLinkInfo.value = null
+  sandboxOpeningId.value = null
+  sandboxCopyingInModal.value = false
+  sandboxHighRiskAck.value = false
+}
+
+async function confirmOpenInSandbox() {
+  if (!sandboxLink.value?.id) return
+  pageError.value = ''
+  sandboxOpeningId.value = sandboxLink.value.id
+  try {
+    const res = await AxiosInstance.post(`/moderation/external-urls/${sandboxLink.value.id}/open-in-sandbox`, { action: 'open' })
+    const url = res.data?.normalized_url
+    if (url) {
+      window.open(url, '_blank', 'noopener,noreferrer')
+    }
+    closeSandboxModal()
+  } catch (e) {
+    pageError.value =
+      e?.response?.data?.detail?.message ||
+      e?.response?.data?.detail ||
+      e?.message ||
+      'Could not open link'
+  } finally {
+    sandboxOpeningId.value = null
+  }
+}
+
+async function copyUrlLogged(link) {
+  if (!link?.id) return
+  pageError.value = ''
+  sandboxCopyId.value = link.id
+  try {
+    const res = await AxiosInstance.post(`/moderation/external-urls/${link.id}/open-in-sandbox`, { action: 'copy' })
+    const url = res.data?.normalized_url
+    if (url && typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(url)
+    }
+  } catch (e) {
+    pageError.value =
+      e?.response?.data?.detail?.message ||
+      e?.response?.data?.detail ||
+      e?.message ||
+      'Could not copy URL'
+  } finally {
+    sandboxCopyId.value = null
+  }
+}
+
+async function copyUrlInModal() {
+  if (!sandboxLink.value?.id) return
+  sandboxCopyingInModal.value = true
+  pageError.value = ''
+  try {
+    const res = await AxiosInstance.post(`/moderation/external-urls/${sandboxLink.value.id}/open-in-sandbox`, { action: 'copy' })
+    const url = res.data?.normalized_url
+    if (url && typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(url)
+    }
+  } catch (e) {
+    pageError.value =
+      e?.response?.data?.detail?.message ||
+      e?.response?.data?.detail ||
+      e?.message ||
+      'Could not copy URL'
+  } finally {
+    sandboxCopyingInModal.value = false
+  }
 }
 
 /* take down modal */
@@ -1384,6 +1545,85 @@ header{
 }
 .link-url:hover{
   text-decoration:underline;
+}
+.link-url-plain{
+  display:block;
+  font-size:13px;
+  color:var(--text);
+  word-break:break-all;
+  cursor:text;
+  user-select:text;
+}
+.link-warning-note{
+  margin:8px 0 10px;
+  font-size:11px;
+}
+.link-action-buttons{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:8px;
+}
+.open-sandbox-btn{
+  margin-top:0;
+}
+.sandbox-url-display{
+  font-size:12px;
+  word-break:break-all;
+  padding:8px 10px;
+  background:rgba(15,23,42,.06);
+  border-radius:8px;
+  margin:8px 0 0;
+}
+.sandbox-risk-row{
+  margin-top:10px;
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px;
+}
+.risk-badge{
+  font-size:11px;
+  font-weight:700;
+  text-transform:uppercase;
+  padding:4px 8px;
+  border-radius:6px;
+}
+.risk-LOW{
+  background:rgba(34,197,94,.15);
+  color:#15803d;
+}
+.risk-MEDIUM{
+  background:rgba(245,158,11,.15);
+  color:#b45309;
+}
+.risk-HIGH{
+  background:rgba(239,68,68,.15);
+  color:#b91c1c;
+}
+.allowlist-tag{
+  font-size:11px;
+  color:var(--accent);
+  font-weight:600;
+}
+.risk-reasons{
+  width:100%;
+  margin:4px 0 0;
+  padding-left:18px;
+}
+.risk-reasons li{
+  margin:2px 0;
+}
+.form-row .row-inline{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-weight:500;
+  cursor:pointer;
+}
+.form-row .row-inline input[type="checkbox"]{
+  width:auto;
+  margin:0;
 }
 .link-meta{
   display:flex;

@@ -116,6 +116,19 @@
           </div>
         </section>
 
+        <!-- Research & Rationale -->
+        <section class="vision-section">
+          <h2 class="section-title">
+            <span class="section-icon">📋</span>
+            Research & Rationale: Why a centralized student community hub is needed…
+          </h2>
+          <div class="vision-content">
+            <p>
+              Students today face a fragmented landscape when searching for internships, clubs, tutoring, and volunteering. Information is scattered across school bulletin boards, social media, and dozens of websites—leading to missed opportunities and wasted time. A centralized community resource hub addresses this by giving students one place to discover, filter, and apply to opportunities that match their interests and goals.
+            </p>
+          </div>
+        </section>
+
         <!-- Vision Section -->
         <section class="vision-section">
           <h2 class="section-title">

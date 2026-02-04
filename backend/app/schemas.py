@@ -293,6 +293,32 @@ class ExternalUrlDecision(BaseModel):
     approved: bool
 
 
+class LinkInfoOut(BaseModel):
+    """Validated/normalized URL and risk info (no logging)."""
+    normalized_url: str
+    host: str
+    is_https: bool
+    allowlisted: bool
+    risk_level: str  # LOW, MEDIUM, HIGH
+    reasons: List[str] = Field(default_factory=list)
+
+
+class OpenInSandboxAction(BaseModel):
+    """Action to log: open or copy."""
+    action: Literal["open", "copy"] = "open"
+
+
+class OpenInSandboxOut(BaseModel):
+    """Response after logging open/copy; frontend uses normalized_url to open or copy."""
+    ok: bool = True
+    normalized_url: str
+    host: str
+    is_https: bool
+    allowlisted: bool
+    risk_level: str
+    reasons: List[str] = Field(default_factory=list)
+
+
 # =========================
 # Contact / Email
 # =========================

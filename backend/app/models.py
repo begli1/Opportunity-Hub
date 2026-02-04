@@ -280,6 +280,40 @@ class Application(Base):
     decided_by: Mapped[Optional["User"]] = relationship(foreign_keys=[decided_by_user_id])
 
 
+class ModerationLinkOpen(Base):
+    """Log when a moderator opens or copies a user-submitted external URL (safe link review)."""
+    __tablename__ = "moderation_link_opens"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    opportunity_id: Mapped[int] = mapped_column(
+        ForeignKey("opportunities.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    moderator_user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    action: Mapped[str] = mapped_column(String(20), nullable=False)  # OPEN, COPY
+    normalized_url: Mapped[str] = mapped_column(String(2048), nullable=False)
+    host: Mapped[str] = mapped_column(String(253), nullable=False)
+    risk_level: Mapped[str] = mapped_column(String(10), nullable=False)  # LOW, MEDIUM, HIGH
+    reasons: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON array or comma-separated
+    user_agent: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    ip: Mapped[Optional[str]] = mapped_column(String(45), nullable=True)
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(timezone.utc),
+    )
+
+    opportunity: Mapped["Opportunity"] = relationship()
+    moderator: Mapped["User"] = relationship(foreign_keys=[moderator_user_id])
+
+
 async def async_main():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
