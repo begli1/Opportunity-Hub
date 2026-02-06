@@ -39,7 +39,6 @@ from .schemas import (
     AppealCreate, AppealDecision, AppealItem, ReportedOpportunityItem, ReportItem, ReportDecision,
     ExternalUrlItem, ExternalUrlDecision, ContactCreate,
     LinkInfoOut, OpenInSandboxAction, OpenInSandboxOut,
-    ForgotPasswordRequest, ForgotPasswordResponse, ResetPasswordRequest,
 )
 from openai import OpenAI
 import anyio
