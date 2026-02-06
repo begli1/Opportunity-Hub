@@ -450,7 +450,9 @@
         <h3>Privacy</h3>
         <p class="muted">
           Opportunity Hub stores your account info (username, email) and the posts you create.
-          Applications you submit are visible to the creator of that post. We don't sell your data.
+          Applications you submit are visible to the creator of that post. Password encryption
+          is implemented using hashing and salting techniques to ensure safety and security.
+          We don't sell your data.
         </p>
         <div class="op-actions">
           <button class="btn btn-primary small-btn" type="button" @click="isPrivacyOpen = false">

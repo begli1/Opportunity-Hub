@@ -57,6 +57,9 @@
           <p class="page-subtitle">
             Technologies, frameworks, and resources used to build Opportunity Hub
           </p>
+          <p class="affirmation-statement">
+            We use frameworks and libraries for development, but all application code is written by our team.
+          </p>
         </section>
 
         <!-- Technologies Section -->
@@ -276,16 +279,16 @@
               <p>Web development tutorials and references</p>
             </a>
 
-            <a href="https://stackoverflow.com/" target="_blank" rel="noopener" class="resource-card so">
-              <div class="resource-logo">SO</div>
-              <h4>Stack Overflow</h4>
-              <p>Community Q&A for programming questions</p>
+            <a href="https://www.freecodecamp.org/" target="_blank" rel="noopener" class="resource-card fcc">
+              <div class="resource-logo">FCC</div>
+              <h4>freeCodeCamp</h4>
+              <p>Free coding tutorials and certifications</p>
             </a>
 
-            <a href="https://github.com/" target="_blank" rel="noopener" class="resource-card gh">
-              <div class="resource-logo">GH</div>
-              <h4>GitHub</h4>
-              <p>Version control and code collaboration</p>
+            <a href="https://web.dev/" target="_blank" rel="noopener" class="resource-card webdev">
+              <div class="resource-logo">web</div>
+              <h4>web.dev</h4>
+              <p>Google's web development tutorials and guides</p>
             </a>
 
             <a href="https://www.youtube.com/" target="_blank" rel="noopener" class="resource-card yt">
@@ -389,6 +392,25 @@
           </div>
           <p class="muted small-text" style="margin-top: 12px;">
             Background image used on the Login and Signup pages. Licensed from iStock by Getty Images.
+          </p>
+
+          <h3 class="credits-subtitle" style="margin-top: 24px; margin-bottom: 12px; font-size: 15px;">Framework & Library Logos</h3>
+          <div class="docs-list">
+            <a href="https://vuejs.org/style-guide/brand-guidelines.html" target="_blank" rel="noopener" class="doc-link">
+              <span class="doc-name">Vue.js logo</span>
+              <span class="doc-url">Vue.js — used per brand guidelines</span>
+            </a>
+            <a href="https://vitejs.dev/" target="_blank" rel="noopener" class="doc-link">
+              <span class="doc-name">Vite logo</span>
+              <span class="doc-url">Vite (MIT License)</span>
+            </a>
+            <a href="https://fonts.google.com/icons" target="_blank" rel="noopener" class="doc-link">
+              <span class="doc-name">Material Icons (lock, person)</span>
+              <span class="doc-url">Google — Apache License 2.0</span>
+            </a>
+          </div>
+          <p class="muted small-text" style="margin-top: 12px;">
+            The Opportunity Hub logo in the navbar is our original design.
           </p>
         </section>
       </div>
@@ -655,6 +677,14 @@ header{
   margin:0 auto;
 }
 
+.affirmation-statement{
+  font-size:14px;
+  color:var(--muted);
+  font-style:italic;
+  max-width:520px;
+  margin:16px auto 0;
+}
+
 /* Sections */
 .ref-section{
   margin-bottom:48px;
@@ -820,8 +850,8 @@ header{
 
 .resource-card.mdn .resource-logo{ background:linear-gradient(135deg, #000, #333); }
 .resource-card.w3 .resource-logo{ background:linear-gradient(135deg, #04aa6d, #087f5b); }
-.resource-card.so .resource-logo{ background:linear-gradient(135deg, #f48024, #bc5d00); }
-.resource-card.gh .resource-logo{ background:linear-gradient(135deg, #24292e, #0d1117); }
+.resource-card.fcc .resource-logo{ background:linear-gradient(135deg, #0a0a23, #1a1a3e); }
+.resource-card.webdev .resource-logo{ background:linear-gradient(135deg, #4285f4, #34a853); }
 .resource-card.yt .resource-logo{ background:linear-gradient(135deg, #ff0000, #cc0000); }
 
 .resource-card h4{
