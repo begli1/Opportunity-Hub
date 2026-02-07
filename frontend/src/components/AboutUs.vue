@@ -187,7 +187,7 @@
             </p>
             <div class="worklog-actions">
               <a 
-                href="/Work log webmaster.pdf" 
+                href="/updated work log webmaster.pdf" 
                 target="_blank" 
                 class="btn btn-primary worklog-btn"
               >
@@ -195,8 +195,8 @@
                 View Work Log PDF
               </a>
               <a 
-                href="/Work log webmaster.pdf" 
-                download="Work log webmaster.pdf"
+                href="/updated work log webmaster.pdf" 
+                download="updated work log webmaster.pdf"
                 class="btn btn-outline worklog-btn"
               >
                 <span>⬇️</span>
@@ -205,7 +205,7 @@
             </div>
             <div class="worklog-preview">
               <iframe 
-                src="/Work log webmaster.pdf#toolbar=1" 
+                src="/updated work log webmaster.pdf#toolbar=1" 
                 type="application/pdf"
                 class="pdf-viewer"
                 title="Work Log PDF Preview"
