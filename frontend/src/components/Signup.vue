@@ -88,7 +88,10 @@ async function handleSignup() {
       const detail = err.response.data?.detail || {}
       const code = detail.code
 
-      if (status === 409 && code === 'USERNAME_TAKEN') {
+      if (status === 400 && code === 'INVALID_USERNAME') {
+        errors.username = true
+        errorMessage.value = detail.message || 'Username contains inappropriate content. Please choose a different username.'
+      } else if (status === 409 && code === 'USERNAME_TAKEN') {
         errors.username = true
         errorMessage.value = detail.message || 'Username already taken.'
       } else if (status === 409 && code === 'EMAIL_TAKEN') {

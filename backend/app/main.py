@@ -429,34 +429,101 @@ def _build_opportunity_text(payload) -> str:
     ]
     return "\n".join(p.strip() for p in parts if p and p.strip())
 
-def _moderate_text_sync(text: str) -> dict:
-    """
-    Returns:
-      {
-        flagged: bool,
-        categories: dict[str, bool],
-        category_scores: dict[str, float]
-      }
-    """
+_MODERATION_PROMPT = """You are a content moderator for a student opportunities platform (internships, clubs, volunteering, tutoring). Analyze the following text for inappropriate content.
+
+Flag as inappropriate if it contains ANY of: profanity, swear words, vulgar language, hate speech, harassment, bullying, sexual content, violence, threats, slurs, spam, scams, or content unsuitable for a school/student audience.
+
+Respond with JSON only, no other text:
+{"flagged": true or false, "reason": "Brief reason if flagged (e.g. 'Inappropriate language', 'Profanity', 'Hate speech'), or empty string if OK"}
+Keep reason under 80 characters."""
+
+_USERNAME_PROMPT = """You are a username validator for a student platform. Check if this username is appropriate for a school/student community.
+
+Flag as inappropriate if it contains: profanity, swear words, vulgarity, hate speech, slurs, sexual references, harassment, bullying, or anything unsuitable for students.
+
+Respond with JSON only, no other text:
+{"appropriate": true or false, "reason": "Brief reason if inappropriate (e.g. 'Contains inappropriate language'), or empty string if OK"}
+Keep reason under 60 characters."""
+
+def _parse_moderation_json(raw: str) -> dict:
+    """Parse JSON from AI response, handling markdown code blocks."""
+    raw = (raw or "").strip()
+    # Strip ```json ... ``` if present
+    if raw.startswith("```"):
+        lines = raw.split("\n")
+        out = []
+        in_block = False
+        for line in lines:
+            if line.strip().startswith("```"):
+                in_block = not in_block
+                continue
+            if in_block:
+                out.append(line)
+        raw = "\n".join(out)
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        return {"flagged": False, "reason": ""}
+
+def _check_username_appropriate_sync(username: str) -> tuple[bool, str]:
+    """Returns (is_appropriate, reason_if_not). Synchronous."""
+    if not username or not username.strip():
+        return True, ""
     client = _openai_client()
-    resp = client.moderations.create(
-        model="omni-moderation-latest",
-        input=text,
-    )
-    r = resp.results[0]
-    return {
-        "flagged": bool(r.flagged),
-        "categories": dict(r.categories),
-        "category_scores": dict(r.category_scores),
-    }
+    try:
+        resp = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": _USERNAME_PROMPT},
+                {"role": "user", "content": f'Username: "{username}"'},
+            ],
+            max_tokens=100,
+        )
+        content = (resp.choices[0].message.content or "").strip()
+        data = _parse_moderation_json(content)
+        appropriate = data.get("appropriate", True)
+        reason = (data.get("reason") or "").strip()
+        return bool(appropriate), reason[:60]
+    except Exception as e:
+        print(f"[username_check] AI error: {e}")
+        return True, ""  # Allow on error to avoid blocking signups
+
+def _moderate_content_sync(text: str) -> dict:
+    """
+    Custom AI moderation via Chat API. Returns:
+      { flagged: bool, reason: str, categories: list[str] }
+    """
+    if not text or not text.strip():
+        return {"flagged": False, "reason": "", "categories": []}
+    client = _openai_client()
+    try:
+        resp = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": _MODERATION_PROMPT},
+                {"role": "user", "content": text[:4000]},
+            ],
+            max_tokens=120,
+        )
+        content = (resp.choices[0].message.content or "").strip()
+        data = _parse_moderation_json(content)
+        flagged = bool(data.get("flagged", False))
+        reason = (data.get("reason") or "").strip()[:200]
+        categories = [reason] if flagged and reason else []
+        return {"flagged": flagged, "reason": reason, "categories": categories}
+    except Exception as e:
+        print(f"[moderation] AI error: {e}")
+        return {"flagged": False, "reason": "", "categories": []}
+
+async def check_username_appropriate(username: str) -> tuple[bool, str]:
+    return await anyio.to_thread.run_sync(_check_username_appropriate_sync, username)
 
 async def moderate_opportunity_payload(payload) -> dict:
     text = _build_opportunity_text(payload).strip()
     if not text:
-        return {"flagged": False, "categories": {}, "category_scores": {}}
+        return {"flagged": False, "reason": "", "categories": []}
 
-    # SDK call is sync; run in a thread so FastAPI stays responsive
-    return await anyio.to_thread.run_sync(_moderate_text_sync, text)
+    return await anyio.to_thread.run_sync(_moderate_content_sync, text)
 async def moderate_opportunity_after_create(opportunity_id: int, payload_dict: dict):
     async with async_session() as session:
         try:
@@ -485,14 +552,18 @@ async def moderate_opportunity_after_create(opportunity_id: int, payload_dict: d
 
             mod = await moderate_opportunity_payload(_TempPayload)
             is_flagged = bool(mod.get("flagged"))
-            categories = mod.get("categories") or {}
-            true_cats = [k for k, v in categories.items() if v]
+            reason = (mod.get("reason") or "").strip()[:200]
+            categories = mod.get("categories") or []
 
-            # Only write AI fields
+            # Only write AI fields (prefix reason so we can identify AI flags for auto-unflag on edit)
             opp.is_flagged = is_flagged
             opp.flagged_at = datetime.now(timezone.utc) if is_flagged else None
-            opp.flagged_reason = "Auto-flagged by AI moderation" if is_flagged else None
-            opp.flagged_categories = json.dumps(true_cats) if true_cats else None
+            if is_flagged:
+                display_reason = f"AI moderation: {reason}" if reason else "Auto-flagged by AI moderation"
+                opp.flagged_reason = display_reason[:200]
+            else:
+                opp.flagged_reason = None
+            opp.flagged_categories = json.dumps(categories) if categories else None
 
             await session.commit()
 
@@ -519,15 +590,27 @@ async def health():
 @app.post("/register", response_model=Token, status_code=201)
 async def register(user: UserCreate, db: DbDep):
     email_norm = user.email.strip().lower()
+    username_trimmed = (user.username or "").strip()
 
-    if await get_user_by_username(db, user.username):
+    # AI check: inappropriate username
+    appropriate, reason = await check_username_appropriate(username_trimmed)
+    if not appropriate:
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "code": "INVALID_USERNAME",
+                "message": reason or "Username contains inappropriate content. Please choose a different username.",
+            },
+        )
+
+    if await get_user_by_username(db, username_trimmed):
         raise HTTPException(status_code=409, detail={"code": "USERNAME_TAKEN", "message": "Username already taken."})
     if await get_user_by_email(db, email_norm):
         raise HTTPException(status_code=409, detail={"code": "EMAIL_TAKEN", "message": "Email already registered."})
 
     password_hash = hash_password(user.password)
 
-    db_user = User(username=user.username, email=email_norm, password_hash=password_hash)
+    db_user = User(username=username_trimmed, email=email_norm, password_hash=password_hash)
     db.add(db_user)
     try:
         await db.commit()
@@ -1191,17 +1274,17 @@ async def update_my_opportunity(
 
     mod = await moderate_opportunity_payload(_TempPayload)
     is_flagged = bool(mod.get("flagged"))
+    reason = (mod.get("reason") or "").strip()[:200]
+    categories = mod.get("categories") or []
 
-    categories = mod.get("categories") or {}
-    true_cats = [k for k, v in categories.items() if v]
-
-    # Always flag if AI detects problematic content (hate speech, etc.)
+    # Always flag if AI detects problematic content (hate speech, profanity, etc.)
     # This will flag even if the post was previously approved
     if is_flagged:
         opp.is_flagged = True
         opp.flagged_at = datetime.now(timezone.utc)
-        opp.flagged_reason = "Auto-flagged by AI moderation"
-        opp.flagged_categories = json.dumps(true_cats) if true_cats else None
+        display_reason = f"AI moderation: {reason}" if reason else "Auto-flagged by AI moderation"
+        opp.flagged_reason = display_reason[:200]
+        opp.flagged_categories = json.dumps(categories) if categories else None
         
         # If post was previously appealed and approved, clear appeal status for new appeal
         if opp.appeal_status == "approved":
