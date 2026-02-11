@@ -661,6 +661,21 @@ async def check_moderator_status(current_user: CurrentUser):
 # Opportunities + Saved
 # =========================
 
+@app.get("/opportunities/count")
+async def get_opportunities_count(db: DbDep):
+    """Public endpoint: count of visible opportunities (no auth required)."""
+    stmt = (
+        select(func.count(Opportunity.id))
+        .where(Opportunity.is_flagged == False)
+        .where(
+            ((Opportunity.external_url_approved.is_(None)) & (Opportunity.allow_external_apply == False)) |
+            (Opportunity.external_url_approved == True)
+        )
+    )
+    count = (await db.execute(stmt)).scalar_one()
+    return {"count": count}
+
+
 @app.get("/opportunities", response_model=list[OpportunityOut])
 async def list_opportunities(
     db: DbDep,

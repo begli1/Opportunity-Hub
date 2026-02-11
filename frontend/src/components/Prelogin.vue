@@ -214,7 +214,7 @@
       <section class="stats">
         <div class="stat">
           <div class="stat-label">Community Resources in the hub</div>
-          <div class="stat-value">120+</div>
+          <div class="stat-value">{{ opportunityCount != null ? opportunityCount + '+' : '—' }}</div>
         </div>
         <div class="stat">
           <div class="stat-label">Resource Categories</div>
@@ -482,7 +482,8 @@
 
   
   <script setup>
-  import { ref, computed } from 'vue';
+  import { ref, computed, onMounted } from 'vue';
+  import AxiosInstance from '@/apiClient';
   
   // Search + filtering state
   const query = ref('');
@@ -539,6 +540,18 @@
   
   // Footer year (simple const is fine in <script setup>)
   const year = new Date().getFullYear();
+
+  // Opportunity count (fetched from API)
+  const opportunityCount = ref(null);
+  onMounted(async () => {
+    try {
+      const res = await AxiosInstance.get('/opportunities/count');
+      const n = res.data?.count;
+      opportunityCount.value = typeof n === 'number' ? n : null;
+    } catch {
+      opportunityCount.value = null;
+    }
+  });
   
   // Privacy modal
   const isPrivacyOpen = ref(false);
