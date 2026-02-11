@@ -912,6 +912,7 @@ async function loadOpportunities() {
 
 // apply modal
 function openApply(op) {
+  closeDetails()  // close details modal so apply form is visible
   applyingTo.value = op
   applyError.value = ''
   applySuccess.value = false
