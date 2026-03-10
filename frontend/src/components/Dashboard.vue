@@ -526,7 +526,14 @@
 
         <div class="form-row">
           <label>Deadline</label>
-          <p class="muted">{{ detailsOp?.deadline }}</p>
+          <p class="muted">
+            {{
+              detailsOp?.deadline_text ||
+              (detailsOp?.deadline_at
+                ? new Date(detailsOp.deadline_at).toLocaleDateString()
+                : 'No deadline listed')
+            }}
+          </p>
         </div>
 
         <div class="form-row">
