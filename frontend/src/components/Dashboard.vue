@@ -133,7 +133,7 @@
         <!-- Greeting row -->
         <section class="welcome-row">
           <div>
-            <p class="welcome-eyebrow">Welcome back,</p>
+            <p class="welcome-eyebrow">Welcome back!</p>
             <h1 class="welcome-title">{{ userName }}</h1>
             <p class="welcome-sub">
               Here’s what’s happening in your community resource hub today.
