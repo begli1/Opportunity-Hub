@@ -61,11 +61,11 @@
           <h1>Find student opportunities without chasing ten different websites.</h1>
           <p class="hero-intro">
             Opportunity Hub helps students discover internships, volunteering, clubs,
-            tutoring, leadership programs, and community events in one centralized platform.
+            and tutoring in one centralized platform.
           </p>
           <p class="hero-support">
             Built to make real opportunities easier to find, easier to trust, and easier
-            to act on for students, schools, and local organizations.
+            to act on for students looking for meaningful opportunities.
           </p>
 
           <div class="hero-ctas">
@@ -113,12 +113,12 @@
       <section id="purpose" class="section-shell two-up">
         <div class="section-copy">
           <span class="section-kicker">Why Opportunity Hub matters</span>
-          <h2>Students lose opportunities when information is scattered and inconsistent.</h2>
-          <p>
-            Internships might live on a district page, volunteer events might be buried in a
+            <h2>Students lose opportunities when information is scattered and inconsistent.</h2>
+            <p>
+              Internships might live on a district page, volunteer events might be buried in a
             flyer, and tutoring or club updates often stay locked inside separate systems.
             That fragmentation makes students miss chances they would have used.
-          </p>
+            </p>
         </div>
 
         <div class="problem-solution">
@@ -179,7 +179,8 @@
             <h2>A clear student workflow from discovery to follow-through</h2>
             <p>
               The landing page should communicate that Opportunity Hub is a real platform, not
-              just a static directory. The workflow is built around what students actually do.
+              just a static directory. The workflow is built around the main steps students
+              actually take when finding and following up on opportunities.
             </p>
           </div>
         </div>
@@ -253,10 +254,10 @@
         <div class="section-heading">
           <div>
             <span class="section-kicker">Community focused</span>
-            <h2>Designed for the people who actually make student opportunities happen</h2>
+            <h2>Designed around the student experience</h2>
             <p>
-              Opportunity Hub is meant to improve visibility and access for students while also
-              giving schools, clubs, and community organizations a clearer way to share resources.
+              Opportunity Hub is built first for students: helping them discover opportunities,
+              save what matters, and return to one organized dashboard instead of scattered links.
             </p>
           </div>
         </div>
@@ -330,18 +331,6 @@ const resourceCategories = [
     desc: 'Academic support resources for students who need help or want to mentor others in core subjects.',
     color: '#ea580c',
     icon: 'M5 6.75A2.75 2.75 0 0 1 7.75 4h8.5A2.75 2.75 0 0 1 19 6.75v10.5A1.75 1.75 0 0 1 17.25 19H8.1a2.6 2.6 0 0 0-2.6 2.6V6.75Zm0 0A2.75 2.75 0 0 0 2.25 9.5v9.75A1.75 1.75 0 0 0 4 21h13'
-  },
-  {
-    title: 'Community events',
-    desc: 'Programs, workshops, and events that connect students with local initiatives and seasonal opportunities.',
-    color: '#0284c7',
-    icon: 'M7 3.75v2.5M17 3.75v2.5M4 8.25h16M6.25 5.25h11.5A1.75 1.75 0 0 1 19.5 7v11A1.75 1.75 0 0 1 17.75 19.75H6.25A1.75 1.75 0 0 1 4.5 18V7a1.75 1.75 0 0 1 1.75-1.75Z'
-  },
-  {
-    title: 'Leadership',
-    desc: 'Opportunities that help students build confidence, guide projects, and contribute to their communities.',
-    color: '#b45309',
-    icon: 'M12 3.75 18.25 6.5v5.15c0 3.45-2.2 6.6-6.25 8.6-4.05-2-6.25-5.15-6.25-8.6V6.5L12 3.75Zm0 4.25v7.5m-3-4 3-3 3 3'
   }
 ];
 
@@ -363,8 +352,8 @@ const workflowSteps = [
   },
   {
     number: '04',
-    title: 'Connect with organizations',
-    desc: 'Return to trusted postings from schools, clubs, and community partners in one place.'
+    title: 'Follow through',
+    desc: 'Come back to saved and trusted listings so you can keep moving on the opportunities that fit you.'
   }
 ];
 
@@ -389,15 +378,7 @@ const featureCards = [
 const communityGroups = [
   {
     title: 'Students',
-    desc: 'Find meaningful opportunities faster and keep important information in one dashboard.'
-  },
-  {
-    title: 'Schools and clubs',
-    desc: 'Improve visibility for programs, teams, tutoring, and events that students should actually see.'
-  },
-  {
-    title: 'Community organizations',
-    desc: 'Reach student audiences more clearly through a platform built around accessibility and discovery.'
+    desc: 'Find meaningful opportunities faster, save what matters, and keep important information in one dashboard.'
   }
 ];
 
@@ -411,18 +392,18 @@ const impactStats = computed(() => [
   },
   {
     label: 'Core categories',
-    value: '6',
-    description: 'Internships, volunteering, clubs, tutoring, events, and leadership pathways.'
+    value: '4',
+    description: 'Internships, volunteering, clubs, and tutoring are the main opportunity paths on the platform.'
   },
   {
     label: 'Workflow stages',
     value: '4',
-    description: 'A clear flow from discovery to tracking and community connection.'
+    description: 'Students can discover, save or apply, track progress, and follow through in one place.'
   },
   {
-    label: 'Groups served',
-    value: '3',
-    description: 'Students, schools, and community organizations all benefit from one platform.'
+    label: 'Primary audience',
+    value: '1',
+    description: 'The platform is designed first and foremost for students.'
   }
 ]);
 

@@ -62,6 +62,7 @@ class OpportunityOut(BaseModel):
     org: str
     description: str
     location: str
+    created_at: Optional[datetime] = None
 
     deadline_at: Optional[datetime] = None
     deadline_text: str = ""
@@ -103,6 +104,7 @@ class DashboardOut(BaseModel):
     me: UserOut
     stats: DashboardStats
     trending: List[OpportunityOut]
+    for_you: List[OpportunityOut]
     saved: List[OpportunityOut]
 
 

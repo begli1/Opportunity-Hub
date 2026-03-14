@@ -897,6 +897,7 @@ let searchTimer = null
 
 // data
 const trending = ref([])
+const forYouFeed = ref([])
 const savedList = ref([])
 
 function prettyType(t) {
@@ -906,6 +907,15 @@ function prettyType(t) {
 }
 
 const saved = computed(() => savedList.value)
+
+function normalizeOpportunityList(ops) {
+  const savedIds = new Set(savedList.value.map((x) => x.id))
+  return (ops || []).map((op) => ({
+    ...op,
+    type: prettyType(op.type),
+    saved: Boolean(op.saved ?? savedIds.has(op.id)),
+  }))
+}
 
 // backend loads
 async function loadDashboard() {
@@ -919,15 +929,14 @@ async function loadDashboard() {
   // Store user info in authStore for other components
   setUser({ id: data.me.id, username: data.me.username, email: data.me.email })
 
-  trending.value = (data.trending || []).map((op) => ({
-    ...op,
-    type: prettyType(op.type),
-  }))
-
   savedList.value = (data.saved || []).map((op) => ({
     ...op,
     type: prettyType(op.type),
   }))
+
+  trending.value = normalizeOpportunityList(data.trending)
+  forYouFeed.value = normalizeOpportunityList(data.for_you)
+  stats.value.newMatches = forYouFeed.value.length
 }
 
 async function loadOpportunities() {
@@ -936,16 +945,14 @@ async function loadOpportunities() {
   if (activeFilter.value !== 'all') params.type = activeFilter.value
   if (searchQuery.value.trim()) params.q = searchQuery.value.trim()
 
-  const res = await AxiosInstance.get('/opportunities', { params })
-  const ops = res.data || []
+  const [allResponse, forYouResponse] = await Promise.all([
+    AxiosInstance.get('/opportunities', { params }),
+    AxiosInstance.get('/recommendations/for-you', { params }),
+  ])
 
-  const savedIds = new Set(savedList.value.map((x) => x.id))
-
-  trending.value = ops.map((op) => ({
-    ...op,
-    type: prettyType(op.type),
-    saved: Boolean(op.saved ?? savedIds.has(op.id)),
-  }))
+  trending.value = normalizeOpportunityList(allResponse.data)
+  forYouFeed.value = normalizeOpportunityList(forYouResponse.data)
+  stats.value.newMatches = forYouFeed.value.length
 }
 
 // apply modal
@@ -992,15 +999,15 @@ async function quickFilter(typeId) {
 
 // save/unsave
 async function toggleSave(id) {
-  const idx = trending.value.findIndex((x) => x.id === id)
-  if (idx === -1) return
+  const op =
+    trending.value.find((x) => x.id === id) ||
+    forYouFeed.value.find((x) => x.id === id) ||
+    (detailsOp.value?.id === id ? detailsOp.value : null)
 
-  const op = trending.value[idx]
+  if (!op?.id) return
 
   if (op.saved) {
     await AxiosInstance.delete(`/opportunities/${id}/save`)
-
-    trending.value[idx] = { ...op, saved: false }
     savedList.value = savedList.value.filter((x) => x.id !== id)
     stats.value.saved = Math.max(0, (stats.value.saved || 0) - 1)
 
@@ -1008,14 +1015,14 @@ async function toggleSave(id) {
     if (detailsOp.value?.id === id) detailsOp.value = { ...detailsOp.value, saved: false }
   } else {
     await AxiosInstance.post(`/opportunities/${id}/save`)
-
-    trending.value[idx] = { ...op, saved: true }
-    savedList.value = [{ ...trending.value[idx] }, ...savedList.value]
+    savedList.value = [{ ...op, saved: true }, ...savedList.value.filter((x) => x.id !== id)]
     stats.value.saved = (stats.value.saved || 0) + 1
 
     // keep details modal in sync if open
     if (detailsOp.value?.id === id) detailsOp.value = { ...detailsOp.value, saved: true }
   }
+
+  await loadOpportunities()
 }
 
 // Turn API validation errors into user-friendly messages for the post form
@@ -1197,118 +1204,6 @@ function normalizeTags(arr) {
     .filter(Boolean)
 }
 
-const RECOMMENDATION_STOP_WORDS = new Set([
-  'a', 'an', 'and', 'are', 'as', 'at', 'be', 'build', 'community', 'for', 'from', 'get',
-  'help', 'helps', 'in', 'into', 'is', 'it', 'job', 'jobs', 'local', 'near', 'of', 'on',
-  'opportun', 'opportunity', 'opportunities', 'or', 'our', 'program', 'programs', 'resource',
-  'resources', 'student', 'students', 'that', 'the', 'their', 'this', 'to', 'with', 'you',
-  'your'
-])
-
-function normalizePhrase(value) {
-  return String(value || '')
-    .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-}
-
-function stemToken(token) {
-  let value = String(token || '').trim().toLowerCase()
-  if (value.length <= 3) return value
-  if (value.endsWith('ing') && value.length > 5) value = value.slice(0, -3)
-  else if (value.endsWith('ed') && value.length > 4) value = value.slice(0, -2)
-  else if (value.endsWith('ies') && value.length > 5) value = `${value.slice(0, -3)}y`
-  else if (value.endsWith('s') && !value.endsWith('ss') && value.length > 4) value = value.slice(0, -1)
-  return value
-}
-
-function tokenizeText(...parts) {
-  const tokens = []
-
-  for (const part of parts) {
-    const normalized = normalizePhrase(part)
-    if (!normalized) continue
-
-    for (const rawToken of normalized.split(' ')) {
-      const token = stemToken(rawToken)
-      if (!token || token.length < 3) continue
-      if (RECOMMENDATION_STOP_WORDS.has(token)) continue
-      tokens.push(token)
-    }
-  }
-
-  return [...new Set(tokens)]
-}
-
-function buildOpportunityFingerprint(op) {
-  const tagPhrases = normalizeTags(op.tags)
-  const tagTokens = tokenizeText(...tagPhrases)
-  const textTokens = tokenizeText(op.title, op.description, op.org, op.location)
-
-  return {
-    id: op.id,
-    saved: Boolean(op.saved),
-    type: String(op.type || '').trim().toLowerCase(),
-    org: normalizePhrase(op.org),
-    tagPhrases: new Set(tagPhrases),
-    tagTokens: new Set(tagTokens),
-    textTokens: new Set(textTokens),
-  }
-}
-
-function buildRarityMap(fingerprints, selector) {
-  const counts = new Map()
-  const total = Math.max(1, fingerprints.length)
-
-  for (const fingerprint of fingerprints) {
-    const uniqueValues = new Set(selector(fingerprint))
-    for (const value of uniqueValues) {
-      counts.set(value, (counts.get(value) || 0) + 1)
-    }
-  }
-
-  const rarity = new Map()
-  for (const [value, count] of counts.entries()) {
-    rarity.set(value, 1 + Math.log((total + 1) / (count + 1)))
-  }
-
-  return rarity
-}
-
-function scoreSetOverlap(sourceSet, candidateSet, rarityMap, multiplier) {
-  let score = 0
-  let matches = 0
-
-  for (const value of sourceSet) {
-    if (!candidateSet.has(value)) continue
-    score += (rarityMap.get(value) || 1) * multiplier
-    matches += 1
-  }
-
-  return { score, matches }
-}
-
-function scoreSavedSimilarity(source, candidate, rarity) {
-  if (source.id === candidate.id) {
-    return { total: 0, tagMatches: 0, keywordMatches: 0 }
-  }
-
-  const exactTag = scoreSetOverlap(source.tagPhrases, candidate.tagPhrases, rarity.tagPhrases, 8.5)
-  const tagToken = scoreSetOverlap(source.tagTokens, candidate.tagTokens, rarity.tokens, 4.2)
-  const tagIntoText = scoreSetOverlap(source.tagTokens, candidate.textTokens, rarity.tokens, 2.6)
-  const keyword = scoreSetOverlap(source.textTokens, candidate.textTokens, rarity.tokens, 1.35)
-
-  const typeBonus = source.type && source.type === candidate.type ? 0.6 : 0
-  const orgBonus = source.org && source.org === candidate.org ? 0.4 : 0
-
-  return {
-    total: exactTag.score + tagToken.score + tagIntoText.score + keyword.score + typeBonus + orgBonus,
-    tagMatches: exactTag.matches + tagToken.matches + tagIntoText.matches,
-    keywordMatches: keyword.matches,
-  }
-}
-
 function tryParseDeadline(s) {
   if (!s) return null
   const raw = String(s).split('/')[0].trim()
@@ -1317,101 +1212,47 @@ function tryParseDeadline(s) {
   return null
 }
 
-const visibleTrending = computed(() => {
-  let list = [...trending.value]
+function applyAdvancedFilters(list) {
+  let filtered = [...list]
   const a = appliedAdvanced.value
 
-  // location filter
   const locQ = String(a.location || '').trim().toLowerCase()
   if (locQ) {
-    list = list.filter((op) => String(op.location || '').toLowerCase().includes(locQ))
+    filtered = filtered.filter((op) => String(op.location || '').toLowerCase().includes(locQ))
   }
 
-  // tags filter
   const wantTags = parseTagsInput(a.tags)
   if (wantTags.length) {
-    list = list.filter((op) => {
+    filtered = filtered.filter((op) => {
       const have = new Set(normalizeTags(op.tags))
       return wantTags.every((t) => have.has(t))
     })
   }
 
-  // apply method filters
-  if (a.onlyInternalApply) list = list.filter((op) => Boolean(op.allow_apply))
+  if (a.onlyInternalApply) filtered = filtered.filter((op) => Boolean(op.allow_apply))
   if (a.onlyExternalApply) {
-    list = list.filter((op) => Boolean(op.allow_external_apply && op.external_apply_url && op.external_url_approved === true))
+    filtered = filtered.filter((op) => Boolean(op.allow_external_apply && op.external_apply_url && op.external_url_approved === true))
   }
 
-  // sorting
   if (a.sort === 'org') {
-    list.sort((x, y) => String(x.org || '').localeCompare(String(y.org || '')))
+    filtered.sort((x, y) => String(x.org || '').localeCompare(String(y.org || '')))
   } else if (a.sort === 'deadline') {
-    list.sort((x, y) => {
+    filtered.sort((x, y) => {
       const dx = x.deadline_at ? new Date(x.deadline_at).getTime() : Infinity
       const dy = y.deadline_at ? new Date(y.deadline_at).getTime() : Infinity
       return dx - dy
     })
-  } else {
-    // newest: backend already returns newest first, keep order
   }
 
-  return list
-})
+  return filtered
+}
 
-const forYouOpportunities = computed(() => {
-  if (savedList.value.length === 0) return []
-
-  const corpus = [...visibleTrending.value, ...savedList.value]
-  const fingerprints = corpus.map(buildOpportunityFingerprint)
-  const fingerprintById = new Map(fingerprints.map((fingerprint) => [fingerprint.id, fingerprint]))
-  const savedFingerprints = savedList.value
-    .map((op) => fingerprintById.get(op.id))
-    .filter(Boolean)
-
-  const rarity = {
-    tagPhrases: buildRarityMap(fingerprints, (fingerprint) => fingerprint.tagPhrases),
-    tokens: buildRarityMap(fingerprints, (fingerprint) => [
-      ...fingerprint.tagTokens,
-      ...fingerprint.textTokens,
-    ]),
-  }
-
-  return visibleTrending.value
-    .map((op, index) => {
-      const candidate = fingerprintById.get(op.id)
-      const matches = savedFingerprints
-        .map((savedFingerprint) => scoreSavedSimilarity(savedFingerprint, candidate, rarity))
-        .filter((match) => match.total > 0)
-        .sort((a, b) => b.total - a.total)
-
-      const topMatches = matches.slice(0, 3)
-      const baseScore = topMatches.reduce((sum, match) => sum + match.total, 0)
-      const totalTagMatches = topMatches.reduce((sum, match) => sum + match.tagMatches, 0)
-      const totalKeywordMatches = topMatches.reduce((sum, match) => sum + match.keywordMatches, 0)
-      const multiMatchBonus = Math.max(0, topMatches.length - 1) * 2.4
-      const freshnessBonus = Math.max(0, 1.2 - index * 0.03)
-      const savedPenalty = op.saved ? 1.75 : 0
-
-      return {
-        op,
-        index,
-        score: baseScore + multiMatchBonus + freshnessBonus - savedPenalty,
-        tagMatches: totalTagMatches,
-        keywordMatches: totalKeywordMatches,
-      }
-    })
-    .filter((entry) => entry.score >= 6 && (entry.tagMatches > 0 || entry.keywordMatches >= 2))
-    .sort((a, b) => {
-      if (b.score !== a.score) return b.score - a.score
-      if (a.op.saved !== b.op.saved) return Number(a.op.saved) - Number(b.op.saved)
-      return a.index - b.index
-    })
-    .map((entry) => entry.op)
-})
+const visibleTrending = computed(() => applyAdvancedFilters(trending.value))
+const visibleForYou = computed(() => applyAdvancedFilters(forYouFeed.value))
 
 const displayedOpportunities = computed(() =>
   activeOpportunityView.value === 'for-you'
-    ? forYouOpportunities.value
+    ? visibleForYou.value
     : visibleTrending.value
 )
 
@@ -1424,8 +1265,8 @@ const opportunitySectionTitle = computed(() =>
 const opportunitySectionSubtitle = computed(() => {
   if (activeOpportunityView.value === 'for-you') {
     return savedList.value.length === 0
-      ? 'Save opportunities for later to unlock personalized matches.'
-      : 'Matches based on the opportunities you saved for later.'
+      ? 'Recent and popular opportunities while your feed learns from what you save.'
+      : 'Personalized matches ranked from the opportunities you saved for later.'
   }
 
   return 'Browse every opportunity that matches your current filters.'

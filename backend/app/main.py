@@ -22,6 +22,7 @@ import string
 import json
 from urllib.parse import urlparse
 from . import url_safety
+from .recommendations import recommend_for_user
 
 from .schemas import (
     UserCreate,
@@ -244,6 +245,7 @@ def opp_to_out(opp: Opportunity, saved: bool) -> OpportunityOut:
         org=opp.org,
         description=opp.description,
         location=opp.location,
+        created_at=opp.created_at,
 
         deadline_at=opp.deadline_at,
         deadline_text=opp.deadline_text or "",
@@ -281,6 +283,71 @@ def as_utc(dt: datetime | None) -> datetime | None:
         return dt.replace(tzinfo=timezone.utc)
     # aware -> convert to UTC
     return dt.astimezone(timezone.utc)
+
+
+def build_visible_opportunities_stmt(
+    type: Optional[str] = None,
+    q: Optional[str] = None,
+):
+    stmt = (
+        select(Opportunity)
+        .where(Opportunity.is_flagged == False)
+        .where(
+            ((Opportunity.external_url_approved.is_(None)) & (Opportunity.allow_external_apply == False)) |
+            (Opportunity.external_url_approved == True)
+        )
+        .order_by(Opportunity.created_at.desc())
+    )
+
+    if type:
+        stmt = stmt.where(Opportunity.type == type.strip().lower())
+
+    if q:
+        like = f"%{q.strip()}%"
+        stmt = stmt.where(
+            Opportunity.title.ilike(like) |
+            Opportunity.org.ilike(like) |
+            Opportunity.description.ilike(like)
+        )
+
+    return stmt
+
+
+async def fetch_saved_ids(db: AsyncSession, user_id: int) -> set[int]:
+    saved_rows = (
+        await db.execute(
+            select(SavedOpportunity.opportunity_id).where(SavedOpportunity.user_id == user_id)
+        )
+    ).all()
+    return {row[0] for row in saved_rows}
+
+
+async def fetch_saved_opportunities(db: AsyncSession, user_id: int) -> list[Opportunity]:
+    return (
+        await db.execute(
+            select(Opportunity)
+            .join(SavedOpportunity, SavedOpportunity.opportunity_id == Opportunity.id)
+            .where(SavedOpportunity.user_id == user_id)
+            .order_by(SavedOpportunity.created_at.desc())
+        )
+    ).scalars().all()
+
+
+async def fetch_popularity_map(db: AsyncSession, opportunity_ids: list[int]) -> dict[int, int]:
+    if not opportunity_ids:
+        return {}
+
+    rows = (
+        await db.execute(
+            select(
+                SavedOpportunity.opportunity_id,
+                func.count(SavedOpportunity.id),
+            )
+            .where(SavedOpportunity.opportunity_id.in_(opportunity_ids))
+            .group_by(SavedOpportunity.opportunity_id)
+        )
+    ).all()
+    return {opportunity_id: count for opportunity_id, count in rows}
 
 
 # =========================
@@ -683,39 +750,9 @@ async def list_opportunities(
     type: Optional[str] = Query(default=None, description="internship/club/volunteering/tutor"),
     q: Optional[str] = Query(default=None, description="search in title/org/description"),
 ):
-    # Hide posts with pending or rejected external URL
-    # Show posts where:
-    # - Never had external apply (external_url_approved is NULL and allow_external_apply is False)
-    # - External URL was approved
-    stmt = (
-        select(Opportunity)
-        .where(Opportunity.is_flagged == False)
-        .where(
-            ((Opportunity.external_url_approved.is_(None)) & (Opportunity.allow_external_apply == False)) |
-            (Opportunity.external_url_approved == True)
-        )
-        .order_by(Opportunity.created_at.desc())
-    )
-
-
-    if type:
-        stmt = stmt.where(Opportunity.type == type.strip().lower())
-
-    if q:
-        like = f"%{q.strip()}%"
-        stmt = stmt.where(
-            Opportunity.title.ilike(like) |
-            Opportunity.org.ilike(like) |
-            Opportunity.description.ilike(like)
-        )
-
+    stmt = build_visible_opportunities_stmt(type=type, q=q)
     opps = (await db.execute(stmt)).scalars().all()
-
-    # Fetch saved ids for this user in one query
-    saved_rows = (await db.execute(
-        select(SavedOpportunity.opportunity_id).where(SavedOpportunity.user_id == current_user.id)
-    )).all()
-    saved_ids = {row[0] for row in saved_rows}
+    saved_ids = await fetch_saved_ids(db, current_user.id)
 
     return [opp_to_out(o, o.id in saved_ids) for o in opps]
 
@@ -751,54 +788,57 @@ async def unsave_opportunity(opportunity_id: int, db: DbDep, current_user: Curre
 
 @app.get("/users/me/saved", response_model=list[OpportunityOut])
 async def list_saved(db: DbDep, current_user: CurrentUser):
-    stmt = (
-        select(Opportunity)
-        .join(SavedOpportunity, SavedOpportunity.opportunity_id == Opportunity.id)
-        .where(SavedOpportunity.user_id == current_user.id)
-        .order_by(SavedOpportunity.created_at.desc())
-    )
-    opps = (await db.execute(stmt)).scalars().all()
+    opps = await fetch_saved_opportunities(db, current_user.id)
     return [opp_to_out(o, True) for o in opps]
+
+
+@app.get("/recommendations/for-you", response_model=list[OpportunityOut])
+async def for_you_recommendations(
+    db: DbDep,
+    current_user: CurrentUser,
+    type: Optional[str] = Query(default=None, description="internship/club/volunteering/tutor"),
+    q: Optional[str] = Query(default=None, description="search in title/org/description"),
+):
+    opps = (await db.execute(build_visible_opportunities_stmt(type=type, q=q))).scalars().all()
+    saved_opps = await fetch_saved_opportunities(db, current_user.id)
+    saved_ids = {o.id for o in saved_opps}
+    candidate_out = [opp_to_out(o, o.id in saved_ids) for o in opps]
+    saved_out = [opp_to_out(o, True) for o in saved_opps]
+    popularity_by_id = await fetch_popularity_map(db, [o.id for o in opps] + [o.id for o in saved_opps])
+    return recommend_for_user(
+        opportunities=candidate_out,
+        saved_posts=saved_out,
+        popularity_by_id=popularity_by_id,
+    )
 
 
 @app.get("/dashboard", response_model=DashboardOut)
 async def dashboard(db: DbDep, current_user: CurrentUser):
-    # trending: just newest items for now
-    # Hide posts with pending or rejected external URL
-    opps = (await db.execute(
-        select(Opportunity)
-        .where(Opportunity.is_flagged == False)
-        .where(
-            ((Opportunity.external_url_approved.is_(None)) & (Opportunity.allow_external_apply == False)) |
-            (Opportunity.external_url_approved == True)
-        )
-        .order_by(Opportunity.created_at.desc())
-    )).scalars().all()
-
-
-    saved_opps = (await db.execute(
-        select(Opportunity)
-        .join(SavedOpportunity, SavedOpportunity.opportunity_id == Opportunity.id)
-        .where(SavedOpportunity.user_id == current_user.id)
-        .order_by(SavedOpportunity.created_at.desc())
-    )).scalars().all()
+    opps = (await db.execute(build_visible_opportunities_stmt())).scalars().all()
+    saved_opps = await fetch_saved_opportunities(db, current_user.id)
 
     saved_ids = {o.id for o in saved_opps}
     trending_out = [opp_to_out(o, o.id in saved_ids) for o in opps]
     saved_out = [opp_to_out(o, True) for o in saved_opps]
+    popularity_by_id = await fetch_popularity_map(db, [o.id for o in opps] + [o.id for o in saved_opps])
+    for_you_out = recommend_for_user(
+        opportunities=trending_out,
+        saved_posts=saved_out,
+        popularity_by_id=popularity_by_id,
+    )
     apps_count = (await db.execute(
     select(func.count(Application.id)).where(Application.applicant_user_id == current_user.id)
     )).scalar_one()
 
     stats = DashboardStats(
-        newMatches=len(trending_out),
+        newMatches=len(for_you_out),
         saved=len(saved_out),
         applications=apps_count,
         )
 
 
     me = UserOut(id=current_user.id, username=current_user.username, email=current_user.email)
-    return DashboardOut(me=me, stats=stats, trending=trending_out, saved=saved_out)
+    return DashboardOut(me=me, stats=stats, trending=trending_out, for_you=for_you_out, saved=saved_out)
     
 
 @app.post("/opportunities", response_model=OpportunityOut, status_code=201)
