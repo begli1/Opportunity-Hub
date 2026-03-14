@@ -6,14 +6,16 @@
           <router-link to="/" class="brand">
             <svg viewBox="0 0 64 64" aria-hidden="true">
               <defs>
-                <linearGradient id="about-g" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stop-color="#2563eb" />
-                  <stop offset="1" stop-color="#14b8a6" />
+                <linearGradient id="oh-brand-gradient" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#1d4ed8" />
+                  <stop offset="1" stop-color="#0f9d8a" />
                 </linearGradient>
               </defs>
-              <circle cx="28" cy="28" r="18" fill="url(#about-g)" opacity="0.08" />
-              <circle cx="28" cy="28" r="12" fill="none" stroke="url(#about-g)" stroke-width="3" />
-              <path d="M36 36 L46 46" stroke="url(#about-g)" stroke-width="3.2" stroke-linecap="round" />
+              <circle cx="28" cy="28" r="18" fill="url(#oh-brand-gradient)" opacity="0.1" />
+              <circle cx="28" cy="28" r="12" fill="none" stroke="url(#oh-brand-gradient)" stroke-width="3" />
+              <path d="M36 36 L46 46" stroke="url(#oh-brand-gradient)" stroke-width="3.2" stroke-linecap="round" />
+              <path d="M44 16 L44 20 M42 18 L46 18" stroke="url(#oh-brand-gradient)" stroke-width="2" stroke-linecap="round" />
+              <circle cx="44" cy="18" r="1.5" fill="url(#oh-brand-gradient)" />
             </svg>
             Opportunity Hub
           </router-link>
@@ -378,7 +380,6 @@ function closeMenu() { isMenuOpen.value = false }
     radial-gradient(900px 600px at 90% 110%, rgba(45,212,191,.18), transparent 60%),
     var(--bg);
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, "Helvetica Neue", Arial;
-  color:var(--text);
 }
 
 a{color:inherit;text-decoration:none}
