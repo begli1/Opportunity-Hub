@@ -2,457 +2,387 @@
   <div class="prelog">
     <header>
       <div class="container nav">
-        <a class="brand" href="#">
-          <!-- New logo: simple "hub" network icon -->
+        <a class="brand" href="#" @click.prevent="scrollToTop">
           <svg viewBox="0 0 64 64" aria-hidden="true">
             <defs>
-              <!-- Gradient for strokes/fills -->
-              <linearGradient id="oh-search-g" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stop-color="#2563eb" />
-                <stop offset="1" stop-color="#14b8a6" />
+              <linearGradient id="oh-brand-gradient" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#1d4ed8" />
+                <stop offset="1" stop-color="#0f9d8a" />
               </linearGradient>
             </defs>
-
-            <!-- Soft background glow -->
-            <circle
-              cx="28"
-              cy="28"
-              r="18"
-              fill="url(#oh-search-g)"
-              opacity="0.08"
-            />
-
-            <!-- Magnifying glass circle -->
-            <circle
-              cx="28"
-              cy="28"
-              r="12"
-              fill="none"
-              stroke="url(#oh-search-g)"
-              stroke-width="3"
-            />
-
-            <!-- Magnifying glass handle -->
-            <path
-              d="M36 36 L46 46"
-              stroke="url(#oh-search-g)"
-              stroke-width="3.2"
-              stroke-linecap="round"
-            />
-
-            <!-- Spark: small star near top-right -->
-            <path
-              d="M44 16 L44 20 M42 18 L46 18"
-              stroke="url(#oh-search-g)"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-            <circle
-              cx="44"
-              cy="18"
-              r="1.5"
-              fill="url(#oh-search-g)"
-            />
+            <circle cx="28" cy="28" r="18" fill="url(#oh-brand-gradient)" opacity="0.1" />
+            <circle cx="28" cy="28" r="12" fill="none" stroke="url(#oh-brand-gradient)" stroke-width="3" />
+            <path d="M36 36 L46 46" stroke="url(#oh-brand-gradient)" stroke-width="3.2" stroke-linecap="round" />
+            <path d="M44 16 L44 20 M42 18 L46 18" stroke="url(#oh-brand-gradient)" stroke-width="2" stroke-linecap="round" />
+            <circle cx="44" cy="18" r="1.5" fill="url(#oh-brand-gradient)" />
           </svg>
-
           Opportunity Hub
         </a>
-        
 
-        <!-- header buttons -->
-        <nav class="navlinks desktop-nav">
-          <a href="#about" @click.prevent="scrollToSection('about')">About</a>
-          <a href="#areas" @click.prevent="scrollToSection('areas')">Areas</a>
-          <a href="#how" @click.prevent="scrollToSection('how')">How it works</a>
-          <a href="#faq" @click.prevent="scrollToSection('faq')">FAQ</a>
+        <nav class="navlinks desktop-nav" aria-label="Primary">
           <RouterLink to="/about">About Us</RouterLink>
           <RouterLink to="/references">References</RouterLink>
           <RouterLink class="btn btn-primary" to="/signup">Sign up</RouterLink>
           <RouterLink class="btn btn-outline" to="/login">Log in</RouterLink>
         </nav>
 
-    
-          <!-- Hamburger button -->
-          <button 
-            class="hamburger" 
-            :class="{ active: isMenuOpen }"
-            @click="toggleMenu"
-            aria-label="Toggle menu"
-          >
-            <span class="bar"></span>
-            <span class="bar"></span>
-            <span class="bar"></span>
-          </button>
+        <button
+          class="hamburger"
+          :class="{ active: isMenuOpen }"
+          @click="toggleMenu"
+          aria-label="Toggle menu"
+          :aria-expanded="isMenuOpen ? 'true' : 'false'"
+        >
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
+      </div>
+
+      <nav class="mobile-nav" :class="{ active: isMenuOpen }" aria-label="Mobile">
+        <RouterLink to="/about" @click="closeMenu">About Us</RouterLink>
+        <RouterLink to="/references" @click="closeMenu">References</RouterLink>
+        <div class="mobile-nav-buttons">
+          <RouterLink class="btn btn-primary" to="/signup" @click="closeMenu">Sign up</RouterLink>
+          <RouterLink class="btn btn-outline" to="/login" @click="closeMenu">Log in</RouterLink>
         </div>
-
-        <!-- Mobile menu -->
-              
-        <nav class="mobile-nav" :class="{ active: isMenuOpen }">
-          <a href="#about" @click="closeMenu">About</a>
-          <a href="#areas" @click="closeMenu">Areas</a>
-          <a href="#community-orgs" @click="closeMenu">Community</a>
-          <a href="#how" @click="closeMenu">How it works</a>
-          <a href="#faq" @click="closeMenu">FAQ</a>
-          <RouterLink to="/about" @click="closeMenu">About Us</RouterLink>
-          <RouterLink to="/references" @click="closeMenu">References</RouterLink>
-          <div class="mobile-nav-buttons">
-            <RouterLink class="btn btn-primary" to="/signup" @click="closeMenu">Sign up</RouterLink>
-            <RouterLink class="btn btn-outline" to="/login" @click="closeMenu">Log in</RouterLink>
-          </div>
-        </nav>
-      </header>
-
+      </nav>
+    </header>
 
     <main class="container">
-      <!-- HERO -->
       <section class="hero">
         <div class="hero-copy">
-          <span class="badge">Student Community Resource Hub</span>
-          <h1>All your internships, clubs, and tutoring in one place.</h1>
-          <p>
-            Opportunity Hub is a community resource hub designed for students—a vital subgroup of the local community—providing centralized access to educational, career, and service-oriented resources.
+          <span class="eyebrow">Student community resource hub</span>
+          <h1>Find student opportunities without chasing ten different websites.</h1>
+          <p class="hero-intro">
+            Opportunity Hub helps students discover internships, volunteering, clubs,
+            tutoring, leadership programs, and community events in one centralized platform.
           </p>
-          <p>
-            Search real community resources filtered by grade, interest, and time
-            commitment. Built by students, for students.
+          <p class="hero-support">
+            Built to make real opportunities easier to find, easier to trust, and easier
+            to act on for students, schools, and local organizations.
           </p>
-
-          <ul class="hero-points">
-            <li>Verified community resources only</li>
-            <li>Smart filters and saved favorites</li>
-            <li>Free accounts for students and educators</li>
-          </ul>
 
           <div class="hero-ctas">
-            <RouterLink class="btn btn-primary" to="/signup">
-              Create a free account
-            </RouterLink>
-            <a class="btn btn-ghost" href="#areas" @click.prevent="scrollToSection('areas')">
-              Preview areas
-            </a>
-          </div>
-
-          <p class="muted hero-subnote">
-            No credit card. No spam. Log in any time to see full community resources.
-          </p>
-        </div>
-
-        <div class="panel hero-panel">
-          <div class="hero-panel-header">
-            <span class="kicker">Live preview</span>
-            <span class="hero-panel-tag">Signed out view</span>
-          </div>
-
-          <div
-            class="search"
-            role="search"
-            aria-labelledby="search-label"
-          >
-            <label
-              id="search-label"
-              class="sr-only"
-              for="demo-search"
-            >
-              Search example cards
-            </label>
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path d="M13.5 13.5l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-              <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="2" />
-            </svg>
-            <input
-              id="demo-search"
-              v-model="query"
-              placeholder="Try: ‘summer internship’ or ‘math tutoring’"
-              aria-describedby="search-help"
-              autocomplete="off"
-            />
-          </div>
-          <p id="search-help" class="muted search-help">
-            Typing filters the sample cards in real time.
-          </p>
-
-          <div class="taglist taglist-chips">
-            <button
-              v-for="cat in categories"
-              :key="cat.key"
-              class="pill"
-              :data-filter="cat.key"
-              :data-active="activeFilter === cat.key"
-              :aria-pressed="String(activeFilter === cat.key)"
-              @click="setFilter(cat.key)"
-              type="button"
-            >
-              {{ cat.label }}
+            <RouterLink class="btn btn-primary" to="/signup">Get Started</RouterLink>
+            <button class="btn btn-ghost" type="button" @click="scrollToSection('categories')">
+              Browse Opportunities
             </button>
           </div>
 
-          <div id="demo-results" class="cards cards-2" aria-live="polite">
-            <article
-              v-for="card in filteredCards"
-              :key="card.id"
-              class="card"
-              :class="card.category"
-            >
-              <h3>{{ card.title }}</h3>
-              <p>{{ card.desc }}</p>
-            </article>
-
-            <article v-if="filteredCards.length === 0" class="card">
-              <h3>No results</h3>
-              <p class="muted">Try a different term or category.</p>
-            </article>
-          </div>
-
-          <p class="muted hero-panel-footer">
-            Log in to see full community resources, deadlines, and application links.
-          </p>
-        </div>
-      </section>
-
-      <!-- STATS STRIP -->
-      <section class="stats">
-        <div class="stat">
-          <div class="stat-label">Community Resources in the hub</div>
-          <div class="stat-value">{{ opportunityCount != null ? opportunityCount + '+' : '—' }}</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">Resource Categories</div>
-          <div class="stat-value">4</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">Built for</div>
-          <div class="stat-value">High-school students</div>
-        </div>
-      </section>
-
-      <!-- ABOUT / WHO -->
-      <section id="about" class="grid-2 section-gap">
-        <div class="panel align-left">
-          <span class="kicker">What is this?</span>
-          <h2>A focused hub for real student opportunities</h2>
-          <p class="muted">
-            Instead of digging through random flyers and dozens of sites,
-            Opportunity Hub pulls trusted internships, tutoring, community
-            service, and clubs into one searchable place.
-          </p>
-          <ul class="muted feature-list">
-            <li>✅ Always free to browse and apply</li>
-            <li>✅ Filter by interest, grade, and time commitment</li>
-            <li>✅ Save favorites and get reminders after login</li>
-          </ul>
-        </div>
-
-        <div class="panel">
-          <span class="kicker">Who is it for?</span>
-          <h2>Students, mentors, and educators</h2>
-          <p class="muted">
-            Whether you want to build a resume, find help in a class,
-            or fill a club with engaged members, the Hub makes it fast.
-          </p>
-          <div class="persona-chips">
-            <span class="pill">High-schoolers</span>
-            <span class="pill">Mentors</span>
-            <span class="pill">Club leaders</span>
-            <span class="pill">Counselors</span>
+          <div class="hero-meta">
+            <div class="meta-chip">
+              <span class="meta-dot"></span>
+              Centralized opportunities
+            </div>
+            <div class="meta-chip">
+              <span class="meta-dot"></span>
+              Student-friendly dashboard
+            </div>
+            <div class="meta-chip">
+              <span class="meta-dot"></span>
+              Community-focused design
+            </div>
           </div>
         </div>
+
+        <div class="hero-visual">
+          <div class="hero-dashboard">
+            <div class="hero-dashboard-top">
+              <div>
+                <p class="panel-label">Preview</p>
+                <h2>Opportunity dashboard</h2>
+              </div>
+              <span class="status-pill">Signed out view</span>
+            </div>
+
+            <div class="preview-search" role="search" aria-labelledby="demo-search-label">
+              <label id="demo-search-label" class="sr-only" for="demo-search">
+                Search the example opportunity feed
+              </label>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M21 21l-4.2-4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.8" />
+              </svg>
+              <input
+                id="demo-search"
+                v-model="query"
+                type="text"
+                placeholder="Search internships, tutoring, or volunteering"
+                autocomplete="off"
+              />
+            </div>
+
+            <div class="preview-summary">
+              <div class="summary-card">
+                <span class="summary-label">Saved</span>
+                <strong>12</strong>
+              </div>
+              <div class="summary-card">
+                <span class="summary-label">In progress</span>
+                <strong>4</strong>
+              </div>
+              <div class="summary-card">
+                <span class="summary-label">New this week</span>
+                <strong>8</strong>
+              </div>
+            </div>
+
+            <div class="filter-row">
+              <button
+                v-for="filter in previewFilters"
+                :key="filter.key"
+                class="filter-pill"
+                :class="{ active: activeFilter === filter.key }"
+                type="button"
+                :aria-pressed="String(activeFilter === filter.key)"
+                @click="setFilter(filter.key)"
+              >
+                {{ filter.label }}
+              </button>
+            </div>
+
+            <div class="preview-cards" aria-live="polite">
+              <article v-for="card in filteredCards" :key="card.id" class="preview-card">
+                <div class="preview-card-top">
+                  <span class="preview-tag">{{ card.organization }}</span>
+                  <span class="preview-type">{{ card.label }}</span>
+                </div>
+                <h3>{{ card.title }}</h3>
+                <p>{{ card.desc }}</p>
+                <div class="preview-card-meta">
+                  <span>{{ card.meta }}</span>
+                  <span>{{ card.location }}</span>
+                </div>
+              </article>
+
+              <article v-if="filteredCards.length === 0" class="preview-card preview-card-empty">
+                <h3>No matching preview results</h3>
+                <p>Try a different term or switch categories to see more example opportunities.</p>
+              </article>
+            </div>
+          </div>
+
+          <div class="floating-note note-top">
+            <strong>Trusted sources</strong>
+            <span>Schools, clubs, and community organizations can share opportunities in one place.</span>
+          </div>
+
+          <div class="floating-note note-bottom">
+            <strong>Built for action</strong>
+            <span>Save opportunities, track applications, and return to your dashboard later.</span>
+          </div>
+        </div>
       </section>
 
-      <!-- AREAS -->
-      <section id="areas" class="panel section-gap" aria-labelledby="areas-title">
-        <div class="section-header">
+      <section class="impact-strip" aria-label="Platform highlights">
+        <article v-for="stat in impactStats" :key="stat.label" class="impact-card">
+          <span class="impact-label">{{ stat.label }}</span>
+          <strong>{{ stat.value }}</strong>
+          <p>{{ stat.description }}</p>
+        </article>
+      </section>
+
+      <section id="purpose" class="section-shell two-up">
+        <div class="section-copy">
+          <span class="section-kicker">Why Opportunity Hub matters</span>
+          <h2>Students lose opportunities when information is scattered and inconsistent.</h2>
+          <p>
+            Internships might live on a district page, volunteer events might be buried in a
+            flyer, and tutoring or club updates often stay locked inside separate systems.
+            That fragmentation makes students miss chances they would have used.
+          </p>
+        </div>
+
+        <div class="problem-solution">
+          <article class="split-card split-card-problem">
+            <span class="split-label">The problem</span>
+            <h3>Too many disconnected sources</h3>
+            <p>
+              Students are expected to monitor multiple websites, forms, and announcements just
+              to stay informed.
+            </p>
+          </article>
+          <article class="split-card split-card-solution">
+            <span class="split-label">The solution</span>
+            <h3>One centralized, trusted student hub</h3>
+            <p>
+              Opportunity Hub brings together community resources into a single system that is
+              searchable, organized, and easier to use.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section id="categories" class="section-shell">
+        <div class="section-heading">
           <div>
-            <span class="kicker">Community Resources</span>
-            <h2 id="areas-title">Community Programs for Students</h2>
-            <p class="muted">
-              These are the main sections you’ll find once you log in.
+            <span class="section-kicker">Categories and resources</span>
+            <h2>Main opportunity paths students can explore</h2>
+            <p>
+              The platform is organized around the kinds of opportunities students actually look
+              for, with clear categories and simple browsing.
             </p>
-          </div>
-          <div class="taglist">
-            <span class="pill">STEM</span>
-            <span class="pill">Arts</span>
-            <span class="pill">Civic</span>
-            <span class="pill">Business</span>
-            <span class="pill">Sports</span>
           </div>
         </div>
 
-        <div class="cards cards-4">
-          <article class="card">
-            <h3>Internships</h3>
-            <p>Local and remote, paid or for credit. Learn by doing.</p>
-          </article>
-          <article class="card">
-            <h3>Tutoring</h3>
-            <p>Get help or give help with verified peer and adult tutors.</p>
-          </article>
-          <article class="card">
-            <h3>Community Service</h3>
-            <p>Earn hours with meaningful, vetted projects.</p>
-          </article>
-          <article class="card">
-            <h3>Clubs</h3>
-            <p>Find clubs at your school or citywide and see meeting times.</p>
+        <div class="resource-grid">
+          <article v-for="category in resourceCategories" :key="category.title" class="resource-card">
+            <div class="resource-icon" :style="{ '--icon-color': category.color }">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path
+                  :d="category.icon"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </div>
+            <h3>{{ category.title }}</h3>
+            <p>{{ category.desc }}</p>
           </article>
         </div>
       </section>
 
-      <!-- HOW IT WORKS -->
-      <section id="how" class="panel section-gap">
-        <span class="kicker">How it works</span>
-        <h2>Three simple steps</h2>
-        <div class="steps">
-          <div class="step">
-            <div class="num">1</div>
-            <h3>Create your account</h3>
-            <p class="muted">
-              Use your school email or any email. No payment needed.
+      <section id="workflow" class="section-shell">
+        <div class="section-heading">
+          <div>
+            <span class="section-kicker">How it works</span>
+            <h2>A clear student workflow from discovery to follow-through</h2>
+            <p>
+              The landing page should communicate that Opportunity Hub is a real platform, not
+              just a static directory. The workflow is built around what students actually do.
             </p>
           </div>
-          <div class="step">
-            <div class="num">2</div>
-            <h3>Browse and save</h3>
-            <p class="muted">
-              Filter by interest, grade, schedule, or location. Save favorites.
+        </div>
+
+        <div class="workflow-grid">
+          <article v-for="step in workflowSteps" :key="step.number" class="workflow-card">
+            <div class="workflow-number">{{ step.number }}</div>
+            <h3>{{ step.title }}</h3>
+            <p>{{ step.desc }}</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-shell feature-showcase">
+        <div class="section-heading">
+          <div>
+            <span class="section-kicker">Features preview</span>
+            <h2>Tools that make the hub feel useful, organized, and real</h2>
+            <p>
+              These previews highlight the system behind the platform: a student dashboard,
+              saved opportunities, tracking, posting, and moderation support.
             </p>
           </div>
-          <div class="step">
-            <div class="num">3</div>
-            <h3>Apply or join</h3>
-            <p class="muted">
-              In one click, go to the official application, sign-up form,
-              or club info.
-            </p>
+        </div>
+
+        <div class="feature-layout">
+          <div class="feature-dashboard">
+            <div class="feature-dashboard-header">
+              <div>
+                <p class="panel-label">Student dashboard</p>
+                <h3>One place to manage opportunities</h3>
+              </div>
+              <span class="status-pill status-pill-soft">Active workspace</span>
+            </div>
+
+            <div class="dashboard-panels">
+              <div class="dashboard-panel dashboard-panel-primary">
+                <span class="dashboard-label">Application tracker</span>
+                <strong>Track deadlines and progress</strong>
+                <p>See what is saved, submitted, and still in progress without losing details.</p>
+              </div>
+              <div class="dashboard-panel">
+                <span class="dashboard-label">Saved opportunities</span>
+                <strong>Keep important listings close</strong>
+                <p>Bookmark internships, clubs, tutoring, and service options for later review.</p>
+              </div>
+              <div class="dashboard-panel">
+                <span class="dashboard-label">Organization posts</span>
+                <strong>Promote opportunities clearly</strong>
+                <p>Schools and local groups can publish openings with better visibility for students.</p>
+              </div>
+              <div class="dashboard-panel">
+                <span class="dashboard-label">Moderation and reporting</span>
+                <strong>Support trust and quality</strong>
+                <p>Reporting and moderation help keep listings accurate, helpful, and appropriate.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="feature-card-stack">
+            <article v-for="feature in featureCards" :key="feature.title" class="feature-card">
+              <span class="feature-pill">{{ feature.tag }}</span>
+              <h3>{{ feature.title }}</h3>
+              <p>{{ feature.desc }}</p>
+            </article>
           </div>
         </div>
       </section>
 
-      <!-- CTA + QUESTIONS -->
-      <section id="cta" class="grid-2 section-gap">
-        <div class="panel">
-          <h2>Ready to explore?</h2>
-          <p class="muted">
-            Create a free account to unlock the full directory, application links,
-            favorites, reminders, and more.
-          </p>
-          <div class="hero-ctas">
-            <RouterLink class="btn btn-primary" to="/signup">
-              Sign up — it’s free
-            </RouterLink>
-            <RouterLink class="btn btn-ghost" to="/login">
-              Log in
-            </RouterLink>
+      <section class="section-shell community-section">
+        <div class="section-heading">
+          <div>
+            <span class="section-kicker">Community focused</span>
+            <h2>Designed for the people who actually make student opportunities happen</h2>
+            <p>
+              Opportunity Hub is meant to improve visibility and access for students while also
+              giving schools, clubs, and community organizations a clearer way to share resources.
+            </p>
           </div>
-          <p class="muted tiny">
-            Perfect for school projects, competitions, or a real deployment.
-          </p>
         </div>
 
-        <div class="panel align-left">
-          <h3>Questions before you join?</h3>
-          <details class="faq-item">
-            <summary class="muted">
-              <strong>What can I do here before logging in?</strong>
-            </summary>
-            <p class="muted">
-              You can see how the Hub works and browse example cards.
-              Full community resources and application links appear after you create a free account.
-            </p>
-          </details>
-          <details class="faq-item">
-            <summary class="muted">
-              <strong>Do I need an account to see community resources?</strong>
-            </summary>
-            <p class="muted">
-              Yes. A free account lets you view the full directory, save favorites,
-              and apply or join.
-            </p>
-          </details>
-          <details class="faq-item">
-            <summary class="muted">
-              <strong>How much does it cost?</strong>
-            </summary>
-            <p class="muted">
-              It is 100% free for students and educators. No hidden fees.
-            </p>
-          </details>
-          <details class="faq-item">
-            <summary class="muted">
-              <strong>Who can use the Hub?</strong>
-            </summary>
-            <p class="muted">
-              High-school students and educators. Some community resources may be regional
-              or have age or grade requirements.
-            </p>
-          </details>
-          <details class="faq-item">
-            <summary class="muted">
-              <strong>Where do community resources come from?</strong>
-            </summary>
-            <p class="muted">
-              From verified organizations, schools, and club leaders.
-              We review and update them regularly.
-            </p>
-          </details>
-          <details class="faq-item">
-            <summary class="muted">
-              <strong>Can I add a community resource?</strong>
-            </summary>
-            <p class="muted">
-              Yes. After creating an account, you will see a “Post a community resource” button
-              with a short form.
-            </p>
-          </details>
+        <div class="community-grid">
+          <article v-for="group in communityGroups" :key="group.title" class="community-card">
+            <h3>{{ group.title }}</h3>
+            <p>{{ group.desc }}</p>
+          </article>
         </div>
       </section>
 
-      <!-- FAQ SHORT -->
-      <section id="faq" class="faq panel section-gap-bottom">
-        <span class="kicker">FAQ</span>
-        <h2>Quick answers</h2>
-        <details open>
-          <summary><strong>Is my data safe?</strong></summary>
-          <p class="muted">
-            We collect the minimum needed to run your account and never sell your data.
-            You can delete your account at any time.
-          </p>
-        </details>
-        <details>
-          <summary><strong>Accessibility</strong></summary>
-          <p class="muted">
-            We use semantic tags, solid contrast, keyboard focus, and aria labels.
-            Please test with your standards and report issues.
-          </p>
-        </details>
+      <section class="cta-shell">
+        <div class="cta-panel">
+          <div>
+            <span class="section-kicker">Start exploring</span>
+            <h2>Give students one polished place to discover what is next.</h2>
+            <p>
+              Create an account to unlock the full opportunity hub, or browse the landing page to
+              see how the platform organizes real community resources.
+            </p>
+          </div>
+          <div class="cta-actions">
+            <RouterLink class="btn btn-primary" to="/signup">Sign up free</RouterLink>
+            <RouterLink class="btn btn-outline" to="/login">Log in</RouterLink>
+          </div>
+        </div>
       </section>
     </main>
 
     <footer>
       <div class="container">
         <div class="footer-inner">
-          <p class="muted">
-            © <span>{{ year }}</span> Opportunity Hub. Built by students, for students.
+          <p class="footer-copy">
+            Copyright {{ year }} Opportunity Hub. Built by students, for students.
           </p>
-          <div class="taglist">
-            <RouterLink class="pill" to="/about">About Us</RouterLink>
-            <RouterLink class="pill" to="/references">References</RouterLink>
-            <button class="pill" type="button" @click="openPrivacy">Privacy</button>
-            <button class="pill" type="button" @click="openContact">Contact</button>
+          <div class="footer-links">
+            <RouterLink class="footer-pill" to="/about">About Us</RouterLink>
+            <RouterLink class="footer-pill" to="/references">References</RouterLink>
+            <button class="footer-pill" type="button" @click="openPrivacy">Privacy</button>
+            <button class="footer-pill" type="button" @click="openContact">Contact</button>
           </div>
         </div>
       </div>
     </footer>
 
-    <!-- Privacy Modal -->
     <div v-if="isPrivacyOpen" class="modal-backdrop" @click.self="isPrivacyOpen = false">
       <div class="modal">
         <h3>Privacy</h3>
-        <p class="muted">
-          Opportunity Hub stores your account info (username, email) and the posts you create.
-          Applications you submit are visible to the creator of that post. Password encryption
-          is implemented using hashing and salting techniques to ensure safety and security.
-          We don't sell your data.
+        <p class="modal-copy">
+          Opportunity Hub stores your account information and the posts you create. Applications
+          you submit are visible to the creator of that post. Password protection is handled with
+          hashing and salting techniques, and your data is not sold.
         </p>
         <div class="op-actions">
           <button class="btn btn-primary small-btn" type="button" @click="isPrivacyOpen = false">
@@ -462,16 +392,15 @@
       </div>
     </div>
 
-    <!-- Contact Modal -->
     <div v-if="isContactOpen" class="modal-backdrop" @click.self="isContactOpen = false">
       <div class="modal">
         <h3>Contact</h3>
-        <p class="muted small-text">Please sign in to send us a message.</p>
+        <p class="modal-copy modal-copy-small">Please sign in to send us a message.</p>
         <div class="op-actions">
           <button class="btn btn-ghost small-btn" type="button" @click="isContactOpen = false">
             Close
           </button>
-          <RouterLink to="/login" class="btn btn-primary small-btn" @click="isContactOpen = false">
+          <RouterLink class="btn btn-primary small-btn" to="/login" @click="isContactOpen = false">
             Sign In
           </RouterLink>
         </div>
@@ -480,836 +409,1273 @@
   </div>
 </template>
 
-  
-  <script setup>
-  import { ref, computed, onMounted } from 'vue';
-  import AxiosInstance from '@/apiClient';
-  
-  // Search + filtering state
-  const query = ref('');
-  const activeFilter = ref('all');
-  const isMenuOpen = ref(false);
+<script setup>
+import { computed, onMounted, ref } from 'vue';
+import AxiosInstance from '@/apiClient';
 
-  function toggleMenu() {
-    isMenuOpen.value = !isMenuOpen.value;
-  }
+const query = ref('');
+const activeFilter = ref('all');
+const isMenuOpen = ref(false);
 
-  function closeMenu() {
-    isMenuOpen.value = false;
+const previewFilters = [
+  { key: 'all', label: 'All' },
+  { key: 'internships', label: 'Internships' },
+  { key: 'volunteering', label: 'Volunteering' },
+  { key: 'clubs', label: 'Clubs' },
+  { key: 'tutoring', label: 'Tutoring' },
+  { key: 'leadership', label: 'Leadership' }
+];
+
+const cards = ref([
+  {
+    id: 1,
+    category: 'internships',
+    label: 'Internship',
+    organization: 'City Innovation Lab',
+    title: 'Summer design and tech internship',
+    desc: 'A student-friendly internship focused on digital projects, collaboration, and portfolio growth.',
+    meta: 'Application closes April 12',
+    location: 'Hybrid'
+  },
+  {
+    id: 2,
+    category: 'volunteering',
+    label: 'Volunteer',
+    organization: 'Community Food Network',
+    title: 'Weekend service hours program',
+    desc: 'Join local food distribution events and earn verified volunteer hours through supervised shifts.',
+    meta: 'Flexible scheduling',
+    location: 'On site'
+  },
+  {
+    id: 3,
+    category: 'clubs',
+    label: 'Club',
+    organization: 'Student Leadership Council',
+    title: 'Campus leadership and service club',
+    desc: 'Plan school initiatives, coordinate events, and build leadership experience with peers.',
+    meta: 'Meets every Tuesday',
+    location: 'School based'
+  },
+  {
+    id: 4,
+    category: 'tutoring',
+    label: 'Tutoring',
+    organization: 'Academic Support Center',
+    title: 'Peer tutoring for math and science',
+    desc: 'Students can request help or sign up to tutor classmates in core subjects after school.',
+    meta: 'Open weekly',
+    location: 'In person'
+  },
+  {
+    id: 5,
+    category: 'leadership',
+    label: 'Leadership',
+    organization: 'Youth Advisory Board',
+    title: 'Youth advisory board applications',
+    desc: 'Contribute ideas, represent student voices, and work with community partners on local initiatives.',
+    meta: 'Interview required',
+    location: 'District wide'
   }
-  
-  const categories = [
-    { key: 'all',         label: 'All' },
-    { key: 'internships', label: 'Internships' },
-    { key: 'tutoring',    label: 'Tutoring' },
-    { key: 'service',     label: 'Community Service' },
-    { key: 'clubs',       label: 'Clubs' }
-  ];
-  
-  const cards = ref([
-    { id: 1, category: 'internships', title: 'City Tech Summer Intern', desc: '8-week paid internship for HS students. Applications open in March.' },
-    { id: 2, category: 'tutoring',    title: 'Peer Tutoring — Algebra II', desc: 'Request or offer tutoring sessions; match within your school network.' },
-    { id: 3, category: 'service',     title: 'Park Clean-Up Saturdays', desc: 'Earn verified service hours at weekly neighborhood events.' },
-    { id: 4, category: 'clubs',       title: 'Entrepreneurship Club', desc: 'Pitch nights, guest speakers, and micro-grants for student projects.' }
-  ]);
-  
-  const filteredCards = computed(() => {
-    const q = query.value.trim().toLowerCase();
-    return cards.value.filter(c => {
-      const matchesFilter = activeFilter.value === 'all' || c.category === activeFilter.value;
-      const matchesQuery =
-        !q ||
-        c.title.toLowerCase().includes(q) ||
-        c.desc.toLowerCase().includes(q);
-      return matchesFilter && matchesQuery;
-    });
+]);
+
+const resourceCategories = [
+  {
+    title: 'Internships',
+    desc: 'Career-building experiences that help students explore real industries and build stronger resumes.',
+    color: '#1d4ed8',
+    icon: 'M4.5 8.5h15v9.75A1.75 1.75 0 0 1 17.75 20H6.25A1.75 1.75 0 0 1 4.5 18.25V8.5Zm4-3h7A1.5 1.5 0 0 1 17 7v1.5H7V7a1.5 1.5 0 0 1 1.5-1.5ZM4.5 12h15M10 12v2m4-2v2'
+  },
+  {
+    title: 'Volunteering',
+    desc: 'Community service opportunities that support local organizations while helping students earn verified hours.',
+    color: '#0f9d8a',
+    icon: 'M12 20s-6.5-4.35-8.2-7.3A4.9 4.9 0 0 1 12 5.1a4.9 4.9 0 0 1 8.2 7.6C18.5 15.65 12 20 12 20Z'
+  },
+  {
+    title: 'Clubs',
+    desc: 'School and community groups that help students connect around shared interests and ongoing activities.',
+    color: '#7c3aed',
+    icon: 'M12 4.5 14 8.5l4.5.75-3.25 3.1.8 4.65L12 14.8 7.95 17l.8-4.65L5.5 9.25 10 8.5 12 4.5Z'
+  },
+  {
+    title: 'Tutoring',
+    desc: 'Academic support resources for students who need help or want to mentor others in core subjects.',
+    color: '#ea580c',
+    icon: 'M5 6.75A2.75 2.75 0 0 1 7.75 4h8.5A2.75 2.75 0 0 1 19 6.75v10.5A1.75 1.75 0 0 1 17.25 19H8.1a2.6 2.6 0 0 0-2.6 2.6V6.75Zm0 0A2.75 2.75 0 0 0 2.25 9.5v9.75A1.75 1.75 0 0 0 4 21h13'
+  },
+  {
+    title: 'Community events',
+    desc: 'Programs, workshops, and events that connect students with local initiatives and seasonal opportunities.',
+    color: '#0284c7',
+    icon: 'M7 3.75v2.5M17 3.75v2.5M4 8.25h16M6.25 5.25h11.5A1.75 1.75 0 0 1 19.5 7v11A1.75 1.75 0 0 1 17.75 19.75H6.25A1.75 1.75 0 0 1 4.5 18V7a1.75 1.75 0 0 1 1.75-1.75Z'
+  },
+  {
+    title: 'Leadership',
+    desc: 'Opportunities that help students build confidence, guide projects, and contribute to their communities.',
+    color: '#b45309',
+    icon: 'M12 3.75 18.25 6.5v5.15c0 3.45-2.2 6.6-6.25 8.6-4.05-2-6.25-5.15-6.25-8.6V6.5L12 3.75Zm0 4.25v7.5m-3-4 3-3 3 3'
+  }
+];
+
+const workflowSteps = [
+  {
+    number: '01',
+    title: 'Discover opportunities',
+    desc: 'Browse a centralized feed of internships, service, clubs, tutoring, and events.'
+  },
+  {
+    number: '02',
+    title: 'Save or apply',
+    desc: 'Bookmark opportunities, compare options, and move forward when you are ready.'
+  },
+  {
+    number: '03',
+    title: 'Track your progress',
+    desc: 'Use the dashboard to keep track of deadlines, saved items, and application activity.'
+  },
+  {
+    number: '04',
+    title: 'Connect with organizations',
+    desc: 'Return to trusted postings from schools, clubs, and community partners in one place.'
+  }
+];
+
+const featureCards = [
+  {
+    tag: 'Dashboard',
+    title: 'A clearer student home base',
+    desc: 'Students do not need to restart their search every time they log in.'
+  },
+  {
+    tag: 'Discovery',
+    title: 'Organized browsing experience',
+    desc: 'Cards, categories, and filters keep the platform easy to scan on desktop and mobile.'
+  },
+  {
+    tag: 'Trust',
+    title: 'Moderated community content',
+    desc: 'Posting and reporting tools support a safer, more useful community resource hub.'
+  }
+];
+
+const communityGroups = [
+  {
+    title: 'Students',
+    desc: 'Find meaningful opportunities faster and keep important information in one dashboard.'
+  },
+  {
+    title: 'Schools and clubs',
+    desc: 'Improve visibility for programs, teams, tutoring, and events that students should actually see.'
+  },
+  {
+    title: 'Community organizations',
+    desc: 'Reach student audiences more clearly through a platform built around accessibility and discovery.'
+  }
+];
+
+const opportunityCount = ref(null);
+
+const impactStats = computed(() => [
+  {
+    label: 'Opportunities centralized',
+    value: opportunityCount.value != null ? `${opportunityCount.value}+` : 'Growing',
+    description: 'A shared hub for student opportunities instead of scattered posts and links.'
+  },
+  {
+    label: 'Core categories',
+    value: '6',
+    description: 'Internships, volunteering, clubs, tutoring, events, and leadership pathways.'
+  },
+  {
+    label: 'Workflow stages',
+    value: '4',
+    description: 'A clear flow from discovery to tracking and community connection.'
+  },
+  {
+    label: 'Groups served',
+    value: '3',
+    description: 'Students, schools, and community organizations all benefit from one platform.'
+  }
+]);
+
+const filteredCards = computed(() => {
+  const q = query.value.trim().toLowerCase();
+
+  return cards.value.filter((card) => {
+    const matchesFilter = activeFilter.value === 'all' || card.category === activeFilter.value;
+    const matchesQuery =
+      !q ||
+      card.title.toLowerCase().includes(q) ||
+      card.desc.toLowerCase().includes(q) ||
+      card.organization.toLowerCase().includes(q) ||
+      card.label.toLowerCase().includes(q);
+
+    return matchesFilter && matchesQuery;
   });
-  
-  function setFilter(key) {
-    activeFilter.value = key;
-  }
+});
 
-  function scrollToSection(sectionId) {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      // Update URL hash without creating history entry
-      window.history.replaceState(null, '', `#${sectionId}`);
-    }
-  }
-  
-  // Footer year (simple const is fine in <script setup>)
-  const year = new Date().getFullYear();
-
-  // Opportunity count (fetched from API)
-  const opportunityCount = ref(null);
-  onMounted(async () => {
-    try {
-      const res = await AxiosInstance.get('/opportunities/count');
-      const n = res.data?.count;
-      opportunityCount.value = typeof n === 'number' ? n : null;
-    } catch {
-      opportunityCount.value = null;
-    }
-  });
-  
-  // Privacy modal
-  const isPrivacyOpen = ref(false);
-  
-  function openPrivacy() {
-    isPrivacyOpen.value = true;
-    closeMenu();
-  }
-  
-  // Contact modal
-  const isContactOpen = ref(false);
-  
-  function openContact() {
-    isContactOpen.value = true;
-    closeMenu();
-  }
-  </script>
-  
-  <style scoped>
-
-:global(:root){
-  /* Light, friendly “education” theme */
-  --bg:#f3f4ff;
-  --bg-soft:#eef2ff;
-  --panel:#ffffff;
-  --panel-elevated:#ffffff;
-  --muted:#000000;
-  --text:#0f172a;
-  --accent:#2563eb;   /* blue */
-  --accent-2:#14b8a6; /* teal */
-  --ring:rgba(37,99,235,.25);
-  --card:#ffffff;
-  --card-2:#f9fafb;
-  --success:#22c55e;
-  --warning:#eab308;
-  --danger:#f97373;
-  --radius:18px;
-  --shadow:0 18px 40px rgba(15,23,42,.08);
-  --border:1px solid rgba(15,23,42,.06);
+function toggleMenu() {
+  isMenuOpen.value = !isMenuOpen.value;
 }
 
-/* Utility: visually hidden but accessible */
-.sr-only{
-  position:absolute!important;
-  width:1px!important;height:1px!important;
-  padding:0!important;margin:-1px!important;
-  overflow:hidden!important;clip:rect(0,0,0,0)!important;
-  white-space:nowrap!important;border:0!important;
+function closeMenu() {
+  isMenuOpen.value = false;
 }
 
-*{box-sizing:border-box}
+function setFilter(key) {
+  activeFilter.value = key;
+}
 
-.prelog{
-  min-height:100vh;
+function scrollToSection(sectionId) {
+  const element = document.getElementById(sectionId);
+
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    window.history.replaceState(null, '', `#${sectionId}`);
+  }
+
+  closeMenu();
+}
+
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.history.replaceState(null, '', window.location.pathname);
+  closeMenu();
+}
+
+const year = new Date().getFullYear();
+
+onMounted(async () => {
+  try {
+    const response = await AxiosInstance.get('/opportunities/count');
+    const count = response.data?.count;
+    opportunityCount.value = typeof count === 'number' ? count : null;
+  } catch {
+    opportunityCount.value = null;
+  }
+});
+
+const isPrivacyOpen = ref(false);
+const isContactOpen = ref(false);
+
+function openPrivacy() {
+  isPrivacyOpen.value = true;
+  closeMenu();
+}
+
+function openContact() {
+  isContactOpen.value = true;
+  closeMenu();
+}
+</script>
+
+<style scoped>
+:global(:root) {
+  --prelog-bg: #f4f7fb;
+  --prelog-text: #0f172a;
+  --prelog-muted: #475569;
+  --prelog-blue: #1d4ed8;
+  --prelog-teal: #0f9d8a;
+  --prelog-gold: #c58c29;
+  --prelog-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+  --prelog-shadow-soft: 0 14px 30px rgba(15, 23, 42, 0.06);
+  --prelog-radius-lg: 28px;
+  --prelog-radius-md: 20px;
+}
+
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.prelog {
+  min-height: 100vh;
+  color: var(--prelog-text);
+  font-family: "Segoe UI", "Trebuchet MS", sans-serif;
   background:
-    radial-gradient(900px 500px at 10% -10%, rgba(59,130,246,.20), transparent 60%),
-    radial-gradient(900px 600px at 90% 110%, rgba(45,212,191,.18), transparent 60%),
-    var(--bg);
-  color:var(--text);
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, "Helvetica Neue", Arial;
+    radial-gradient(circle at top left, rgba(29, 78, 216, 0.13), transparent 34%),
+    radial-gradient(circle at 85% 18%, rgba(15, 157, 138, 0.1), transparent 28%),
+    linear-gradient(180deg, #f9fbfe 0%, var(--prelog-bg) 55%, #eef4f9 100%);
 }
 
-a{color:inherit;text-decoration:none}
-
-.container{
-  max-width:1200px;
-  margin:0 auto;
-  padding:24px 24px 32px;
-}
-
-header{
-  position:sticky;
-  top:0;
-  z-index:20;
-  background:rgba(248,250,252,.86);
-  backdrop-filter: blur(12px);
-  border-bottom:1px solid rgba(148,163,184,.25);
-}
-
-.nav{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-}
-
-.brand{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-weight:800;
-  letter-spacing:.04em;
-  font-size:18px;
-}
-
-.brand svg{
-  width:30px;
-  height:30px;
-}
-
-.navlinks{
-  display:flex;
-  gap:14px;
-  align-items:center;
-  flex-wrap:wrap;
-  font-size:14px;
-}
-
-.navlinks a{
-  color:var(--muted);
-}
-
-.navlinks a:hover{
-  color:var(--text);
-}
-
-.navlinks a.btn-primary{
-  color:#fff;
-}
-
-.btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  padding:10px 16px;
-  border-radius:999px;
-  border:1px solid rgba(148,163,184,.4);
-  background:linear-gradient(180deg, #ffffff, #eef2ff);
-  color:var(--text);
-  font-size:14px;
-  cursor:pointer;
-  transition:transform .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
-  box-shadow:0 0 0 rgba(0,0,0,0);
-}
-
-.btn:hover{
-  transform:translateY(-1px);
-  box-shadow:0 10px 24px rgba(15,23,42,.12);
-  border-color:rgba(148,163,184,.9);
-}
-
-.btn-primary{
-  background:linear-gradient(90deg, var(--accent), var(--accent-2));
-  color:#fff;
-  font-weight:700;
-  border:none;
-}
-
-.btn-primary:hover{
-  box-shadow:0 14px 28px rgba(37,99,235,.28);
-}
-
-.btn-outline{
-  background:#ffffff;
-}
-
-.btn-ghost{
-  background:transparent;
-  border:1px solid rgba(148,163,184,.5);
-  color:var(--muted);
-}
-
-/* HERO */
-
-.hero{
-  display:grid;
-  grid-template-columns:minmax(0,1.05fr) minmax(0,1.1fr);
-  gap:32px;
-  align-items:center;
-  padding:48px 0 24px;
-}
-
-.hero-copy h1{
-  font-size:40px;
-  line-height:1.05;
-  margin:12px 0 10px;
-}
-
-.hero-copy p{
-  color:var(--muted);
-  font-size:16px;
-  max-width:46ch;
-}
-
-.badge{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  border-radius:999px;
-  border:1px solid rgba(148,163,184,.5);
-  padding:4px 10px;
-  font-size:11px;
-  color:var(--muted);
-  background:rgba(255,255,255,.9);
-}
-
-.hero-points{
-  margin:14px 0 14px;
-  padding:0;
-  list-style:none;
-  color:var(--muted);
-  font-size:14px;
-  display:grid;
-  gap:4px;
-}
-
-.hero-points li::before{
-  content:"• ";
-  color:var(--accent);
-}
-
-.hero-ctas{
-  margin-top:10px;
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-}
-
-.hero-subnote{
-  margin-top:10px;
-  font-size:13px;
-}
-
-/* HERO PANEL */
-
-.hero-panel{
-  background:
-    radial-gradient(circle at top left, rgba(59,130,246,.16), transparent 60%),
-    radial-gradient(circle at bottom right, rgba(45,212,191,.18), transparent 60%),
-    var(--panel-elevated);
-  border-radius:22px;
-  padding:18px 18px 16px;
-  border:var(--border);
-  box-shadow:var(--shadow);
-}
-
-.hero-panel-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:8px;
-}
-
-.hero-panel-tag{
-  font-size:11px;
-  padding:4px 8px;
-  border-radius:999px;
-  border:1px solid rgba(148,163,184,.6);
-  color:var(--muted);
-  background:rgba(255,255,255,.9);
-}
-
-.hero-panel-footer{
-  margin-top:10px;
-  font-size:12px;
-  color:var(--muted);
-}
-
-/* SEARCH */
-
-.search{
-  display:flex;
-  gap:10px;
-  align-items:center;
-  background:#f9fafb;
-  border:1px solid rgba(148,163,184,.7);
-  padding:10px 12px;
-  border-radius:12px;
-}
-
-.search svg{
-  color:var(--muted);
-}
-
-.search input{
-  flex:1;
-  background:transparent;
-  border:0;
-  outline:0;
-  color:var(--text);
-  font-size:14px;
-}
-
-.search input::placeholder{
-  color:#9ca3af;
-}
-
-.search-help{
-  margin:6px 2px 4px;
-  font-size:11px;
-}
-
-/* TAGS & PILLS */
-
-.taglist{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-}
-
-.taglist-chips{
-  margin:10px 0 14px;
-}
-
-.pill{
-  font-size:12px;
-  border:1px solid rgba(148,163,184,.55);
-  padding:6px 10px;
-  border-radius:999px;
-  color:var(--muted);
-  background:#ffffff;
-  white-space:nowrap;
-}
-
-.pill[data-active="true"]{
-  background:linear-gradient(90deg, var(--accent), var(--accent-2));
-  color:#fff;
-  border:none;
-}
-
-.persona-chips{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top:10px;
-}
-
-/* PANELS & CARDS */
-
-.panel{
-  background:var(--panel);
-  border:var(--border);
-  border-radius:var(--radius);
-  padding:20px 18px 18px;
-  box-shadow:var(--shadow);
-}
-
-.cards{
-  display:grid;
-  gap:14px;
-}
-
-.cards-2{
-  grid-template-columns:repeat(2,minmax(0,1fr));
-}
-
-.cards-4{
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  margin-top:16px;
-}
-
-.card{
-  background:linear-gradient(180deg,var(--card),var(--card-2));
-  border-radius:14px;
-  border:1px solid rgba(148,163,184,.35);
-  padding:14px 14px 12px;
-  box-shadow:0 10px 22px rgba(15,23,42,.08);
-}
-
-.card h3{
-  margin:4px 0 6px;
-  font-size:16px;
-}
-
-.card p{
-  margin:0;
-  color:var(--muted);
-  font-size:13px;
-}
-
-/* STATS */
-
-.stats{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:14px;
-  margin:8px 0 24px;
+a {
+  color: inherit;
+  text-decoration: none;
 }
 
-.stat{
-  background:linear-gradient(120deg,#ffffff,#e0f2fe);
-  border-radius:14px;
-  padding:12px 14px;
-  border:1px solid rgba(148,163,184,.45);
-  box-shadow:0 10px 22px rgba(15,23,42,.08);
+button,
+input {
+  font: inherit;
 }
 
-.stat-label{
-  font-size:11px;
-  text-transform:uppercase;
-  letter-spacing:.12em;
-  color:var(--muted);
+.container {
+  width: min(1220px, calc(100% - 40px));
+  margin: 0 auto;
 }
 
-.stat-value{
-  font-size:18px;
-  font-weight:600;
-  margin-top:4px;
+header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: rgba(248, 251, 255, 0.85);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  backdrop-filter: blur(16px);
 }
 
-/* SECTIONS */
-
-.section-header{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:16px;
-  flex-wrap:wrap;
-}
-
-.section-gap{
-  margin:24px 0;
-}
-
-.section-gap-bottom{
-  margin-bottom:24px;
-}
-
-.grid-2{
-  display:grid;
-  grid-template-columns:1.1fr 0.9fr;
-  gap:18px;
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px 0;
 }
 
-.steps{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:14px;
-  margin-top:10px;
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
 }
 
-.step{
-  padding:14px 14px 12px;
-  border-radius:14px;
-  border:1px dashed rgba(148,163,184,.7);
-  background:linear-gradient(180deg,#ffffff,#eff6ff);
+.brand svg {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
 }
 
-.step .num{
-  width:26px;
-  height:26px;
-  border-radius:999px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  background:#eff6ff;
-  border:1px solid rgba(59,130,246,.7);
-  margin-bottom:6px;
-  font-size:13px;
-  color:var(--accent);
+.navlinks {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
-/* FAQ */
-
-.faq details{
-  background:#ffffff;
-  border:var(--border);
-  padding:12px 12px;
-  border-radius:12px;
-}
-
-.faq details+details{
-  margin-top:8px;
+.navlinks a:not(.btn) {
+  color: var(--prelog-muted);
+  font-size: 0.95rem;
+  transition: color 0.2s ease;
 }
 
-.faq-item{
-  margin-bottom:8px;
+.navlinks a:not(.btn):hover,
+.mobile-nav a:hover {
+  color: var(--prelog-text);
 }
 
-.muted{
-  color:var(--muted);
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--prelog-text);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.55) inset;
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease,
+    background 0.18s ease;
 }
 
-.kicker{
-  font-size:11px;
-  letter-spacing:.14em;
-  text-transform:uppercase;
-  color:var(--muted);
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--prelog-shadow-soft);
+  border-color: rgba(15, 23, 42, 0.14);
 }
 
-.feature-list{
-  margin-top:10px;
-  padding-left:0;
-  list-style:none;
+.btn:focus-visible,
+.filter-pill:focus-visible,
+.footer-pill:focus-visible,
+.hamburger:focus-visible {
+  outline: 3px solid rgba(29, 78, 216, 0.22);
+  outline-offset: 2px;
 }
 
-.feature-list li{
-  margin-bottom:4px;
+.btn-primary {
+  border: none;
+  color: #ffffff;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--prelog-blue), var(--prelog-teal));
 }
 
-.tiny{
-  margin-top:10px;
-  font-size:12px;
+.btn-primary:hover {
+  box-shadow: 0 18px 32px rgba(29, 78, 216, 0.24);
 }
 
-/* FOOTER */
-
-footer{
-  padding:16px 0 20px;
-  border-top:1px solid rgba(148,163,184,.35);
-  color:var(--muted);
-  background:rgba(248,250,252,.9);
-}
-
-.footer-inner{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  flex-wrap:wrap;
+.btn-outline {
+  background: rgba(255, 255, 255, 0.92);
 }
-
-/* ALIGN UTIL */
 
-.align-left,
-.align-left *{
-  text-align:left !important;
+.btn-ghost {
+  background: rgba(255, 255, 255, 0.52);
 }
 
-/* Hamburger */
-/* Hamburger Menu */
-.hamburger{
-  display:none;
-  flex-direction:column;
-  background:transparent;
-  border:none;
-  cursor:pointer;
-  padding:8px;
-  gap:5px;
-  z-index:101;
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
 }
 
-.bar{
-  display:block;
-  width:25px;
-  height:3px;
-  background-color:var(--text);
-  border-radius:2px;
-  transition:all 0.3s ease-in-out;
-  margin:0;
+.bar {
+  width: 20px;
+  height: 2px;
+  margin: 0 auto;
+  border-radius: 999px;
+  background: var(--prelog-text);
+  transition: transform 0.28s ease, opacity 0.28s ease;
 }
 
-.hamburger.active .bar:nth-child(1){
-  transform: translateY(8px) rotate(45deg);
+.hamburger.active .bar:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
 }
 
-.hamburger.active .bar:nth-child(2){
+.hamburger.active .bar:nth-child(2) {
   opacity: 0;
 }
 
-.hamburger.active .bar:nth-child(3){
-  transform: translateY(-8px) rotate(-45deg);
+.hamburger.active .bar:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
 }
 
-/* Mobile Navigation */
-.mobile-nav{
-  display:none;
-  flex-direction:column;
-  gap:0;
-  background:rgba(248,250,252,.95);
-  backdrop-filter: blur(12px);
-  border-top:1px solid rgba(148,163,184,.25);
-  padding:0 24px;
-  max-height:0;
-  overflow:hidden;
-  transition:max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
+.mobile-nav {
+  display: none;
+  flex-direction: column;
+  gap: 0;
+  padding: 0 20px;
+  max-height: 0;
+  overflow: hidden;
+  background: rgba(248, 251, 255, 0.96);
+  border-top: 1px solid rgba(148, 163, 184, 0.16);
+  transition: max-height 0.3s ease, padding 0.3s ease;
 }
 
-.mobile-nav.active{
-  max-height:500px;
-  padding:16px 24px;
+.mobile-nav.active {
+  max-height: 320px;
+  padding: 12px 20px 18px;
 }
 
-.mobile-nav a{
-  color:var(--muted);
-  padding:12px 0;
-  font-size:14px;
-  border-bottom:1px solid rgba(148,163,184,.15);
-  transition:color 0.2s ease;
+.mobile-nav a {
+  padding: 12px 0;
+  color: var(--prelog-muted);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
 }
 
-.mobile-nav a:last-child{
-  border-bottom:none;
-}
-
-.mobile-nav a:hover{
-  color:var(--text);
-}
-.mobile-nav-buttons{
-  margin-top:16px;
-  padding-top:16px;
-  border-top:1px solid rgba(148,163,184,.25);
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-
-.mobile-nav-buttons .btn{
-  width:100%;
-  text-align:center;
-  justify-content:center;
-}
-
-@media (max-width: 640px){
-  .container{
-    padding:18px 16px 28px;
-  }
-
-  .desktop-nav{
-    display:none;
-  }
-
-  .hamburger{
-    display:flex;
-  }
-
-  .mobile-nav{
-    display:flex;
-  }
-}
-
-/* RESPONSIVE */
-
-@media (max-width: 900px){
-  .hero{
-    grid-template-columns:1fr;
-    padding-top:32px;
-  }
-
-  .hero-copy h1{
-    font-size:32px;
-  }
-
-  .cards-4{
-    grid-template-columns:repeat(2,minmax(0,1fr));
-  }
-
-  .steps{
-    grid-template-columns:1fr;
-  }
-
-  .grid-2{
-    grid-template-columns:1fr;
-  }
-
-  .stats{
-    grid-template-columns:repeat(3,minmax(0,1fr));
-  }
-}
-
-@media (max-width: 640px){
-  .container{
-    padding:18px 16px 28px;
-  }
-
-
-    .navlinks a:not(:first-child) {display: none;};
-
-    .navlinks a.icon {
-    float: right;
-    display: block;
-    }
-
-  .navlinks.responsive {position: relative;}
-  .navlinks.responsive a.icon {
-    position: absolute;
-    right: 0;
-    top: 0;
-  }
-  .topnav.responsive a {
-    float: none;
-    display: block;
-    text-align: left;
-  }
-
-
-  .cards-4,
-  .cards-2,
-  .stats{
-    grid-template-columns:1fr;
-  }
-
-  .hero-panel{
-    padding:14px;
-  }
-}
-
-/* Modal styling */
-.modal-backdrop{
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.55);
-  backdrop-filter: blur(6px);
+.mobile-nav-buttons {
   display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 14px;
+}
+
+.mobile-nav-buttons .btn {
+  width: 100%;
+}
+
+main.container {
+  padding: 34px 0 48px;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: 34px;
+  align-items: center;
+  padding: 18px 0 22px;
+}
+
+.eyebrow,
+.section-kicker,
+.panel-label,
+.split-label,
+.impact-label,
+.dashboard-label {
+  display: inline-block;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.eyebrow,
+.section-kicker,
+.panel-label,
+.impact-label,
+.dashboard-label {
+  color: var(--prelog-blue);
+}
+
+.hero-copy h1 {
+  margin: 12px 0 18px;
+  font-size: clamp(2.7rem, 5vw, 4.45rem);
+  line-height: 0.98;
+  max-width: 11.5ch;
+}
+
+.hero-intro,
+.hero-support,
+.section-heading p,
+.section-copy p,
+.split-card p,
+.workflow-card p,
+.resource-card p,
+.feature-card p,
+.community-card p,
+.cta-panel p,
+.impact-card p,
+.preview-card p,
+.dashboard-panel p {
+  margin: 0;
+  color: var(--prelog-muted);
+  line-height: 1.7;
+}
+
+.hero-intro {
+  max-width: 56ch;
+  font-size: 1.08rem;
+}
+
+.hero-support {
+  max-width: 56ch;
+  margin-top: 12px;
+}
+
+.hero-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--prelog-muted);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.04);
+}
+
+.meta-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--prelog-blue), var(--prelog-teal));
+}
+
+.hero-visual {
+  position: relative;
+  padding: 20px 0;
+}
+
+.hero-dashboard,
+.section-shell,
+.cta-panel {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 251, 255, 0.9));
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: var(--prelog-radius-lg);
+  box-shadow: var(--prelog-shadow);
+}
+
+.hero-dashboard::before,
+.section-shell::before,
+.cta-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at top right, rgba(29, 78, 216, 0.09), transparent 24%),
+    radial-gradient(circle at bottom left, rgba(15, 157, 138, 0.08), transparent 28%);
+  pointer-events: none;
+}
+
+.hero-dashboard {
+  padding: 24px;
+}
+
+.hero-dashboard-top,
+.feature-dashboard-header,
+.section-heading,
+.footer-inner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.hero-dashboard-top h2,
+.section-heading h2,
+.section-copy h2,
+.cta-panel h2 {
+  margin: 6px 0 0;
+}
+
+.hero-dashboard-top h2 {
+  font-size: 1.55rem;
+}
+
+.status-pill,
+.feature-pill,
+.preview-tag,
+.preview-type,
+.footer-pill {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  border-radius: 999px;
+  font-size: 0.78rem;
 }
 
-.modal{
-  background: #fff;
-  border-radius: 14px;
-  padding: 20px;
-  width: 100%;
-  max-width: 520px;
-  max-height: 85vh;
-  overflow-y: auto;
-  position: relative;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
-  z-index: 1001;
+.status-pill {
+  padding: 8px 12px;
+  background: rgba(15, 23, 42, 0.04);
+  color: var(--prelog-muted);
 }
 
-.modal::-webkit-scrollbar{
-  width: 8px;
+.status-pill-soft {
+  background: rgba(29, 78, 216, 0.1);
+  color: var(--prelog-blue);
 }
 
-.modal::-webkit-scrollbar-track{
-  background: #f1f5f9;
-  border-radius: 4px;
-}
-
-.modal::-webkit-scrollbar-thumb{
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-
-.modal::-webkit-scrollbar-thumb:hover{
-  background: #000000;
-}
-
-.modal h3{
-  margin: 0 0 12px;
-  font-size: 1.5rem;
-  font-weight: 700;
-}
-
-.modal .muted{
-  color: #000000;
-  margin: 0 0 12px;
-  line-height: 1.6;
-}
-
-.modal .small-text{
-  font-size: 0.85rem;
-}
-
-.op-actions{
-  margin-top: 20px;
+.preview-search {
   display: flex;
-  gap: 8px;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 14px 16px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 16px;
+  background: rgba(247, 250, 252, 0.88);
+  color: var(--prelog-muted);
+}
+
+.preview-search input {
+  flex: 1 1 auto;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--prelog-text);
+}
+
+.preview-search input::placeholder {
+  color: #94a3b8;
+}
+
+.preview-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.summary-card {
+  padding: 14px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff, #f5f8fd);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.summary-card strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 1.45rem;
+}
+
+.summary-label {
+  color: var(--prelog-muted);
+  font-size: 0.86rem;
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.filter-pill {
+  padding: 9px 14px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--prelog-muted);
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.filter-pill:hover,
+.filter-pill.active {
+  transform: translateY(-1px);
+}
+
+.filter-pill.active {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--prelog-blue), var(--prelog-teal));
+  color: #ffffff;
+}
+
+.preview-cards {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.preview-card {
+  padding: 16px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff, #f7fafc);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.preview-card:hover,
+.resource-card:hover,
+.workflow-card:hover,
+.feature-card:hover,
+.community-card:hover,
+.impact-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--prelog-shadow-soft);
+  border-color: rgba(29, 78, 216, 0.16);
+}
+
+.preview-card-top,
+.preview-card-meta,
+.footer-links {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.preview-tag,
+.preview-type {
+  padding: 6px 10px;
+}
+
+.preview-tag {
+  background: rgba(29, 78, 216, 0.08);
+  color: var(--prelog-blue);
+}
+
+.preview-type {
+  background: rgba(15, 23, 42, 0.05);
+  color: var(--prelog-muted);
+}
+
+.preview-card h3,
+.resource-card h3,
+.workflow-card h3,
+.feature-card h3,
+.community-card h3,
+.split-card h3,
+.dashboard-panel strong,
+.cta-panel h2 {
+  margin: 10px 0 8px;
+}
+
+.preview-card-meta {
+  margin-top: 14px;
+  color: var(--prelog-muted);
+  font-size: 0.88rem;
+}
+
+.preview-card-empty p {
+  margin-top: 8px;
+}
+
+.floating-note {
+  position: absolute;
+  max-width: 220px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  box-shadow: var(--prelog-shadow-soft);
+}
+
+.floating-note strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.95rem;
+}
+
+.floating-note span {
+  color: var(--prelog-muted);
+  line-height: 1.55;
+  font-size: 0.9rem;
+}
+
+.note-top {
+  top: -6px;
+  right: -8px;
+}
+
+.note-bottom {
+  bottom: -4px;
+  left: -10px;
+}
+
+.impact-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin: 8px 0 30px;
+}
+
+.impact-card,
+.resource-card,
+.workflow-card,
+.feature-card,
+.community-card,
+.split-card,
+.dashboard-panel {
+  position: relative;
+  padding: 22px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: var(--prelog-radius-md);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.impact-card strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.impact-card p {
+  margin-top: 12px;
+}
+
+.section-shell {
+  padding: 30px;
+  margin: 0 0 26px;
+}
+
+.two-up {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.section-copy h2,
+.section-heading h2,
+.cta-panel h2 {
+  font-size: clamp(1.85rem, 2.8vw, 2.7rem);
+  line-height: 1.08;
+}
+
+.section-copy p {
+  margin-top: 16px;
+  max-width: 60ch;
+}
+
+.problem-solution {
+  display: grid;
+  gap: 16px;
+}
+
+.split-card-problem {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(254, 242, 242, 0.95));
+}
+
+.split-card-solution {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(240, 253, 250, 0.98));
+}
+
+.split-label {
+  color: var(--prelog-gold);
+}
+
+.resource-grid,
+.workflow-grid,
+.community-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.resource-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 22px;
+}
+
+.resource-card {
+  min-height: 210px;
+}
+
+.resource-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: rgba(29, 78, 216, 0.1);
+  color: var(--icon-color);
+}
+
+.resource-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.workflow-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 22px;
+}
+
+.workflow-card {
+  min-height: 210px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(244, 248, 253, 0.96));
+}
+
+.workflow-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 58px;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(29, 78, 216, 0.1);
+  color: var(--prelog-blue);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.feature-showcase {
+  padding-bottom: 32px;
+}
+
+.feature-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 18px;
+  margin-top: 22px;
+}
+
+.feature-dashboard {
+  position: relative;
+  padding: 24px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(245, 249, 255, 0.98), rgba(255, 255, 255, 0.96));
+  border: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.feature-dashboard-header h3 {
+  margin: 6px 0 0;
+  font-size: 1.45rem;
+}
+
+.dashboard-panels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.dashboard-panel {
+  min-height: 170px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.dashboard-panel-primary {
+  background: linear-gradient(145deg, rgba(29, 78, 216, 0.95), rgba(15, 157, 138, 0.94));
+  color: #ffffff;
+}
+
+.dashboard-panel-primary .dashboard-label,
+.dashboard-panel-primary p {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.feature-card-stack {
+  display: grid;
+  gap: 14px;
+}
+
+.feature-card {
+  min-height: 158px;
+}
+
+.feature-pill {
+  padding: 7px 10px;
+  background: rgba(15, 23, 42, 0.05);
+  color: var(--prelog-muted);
+}
+
+.community-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 22px;
+}
+
+.community-card {
+  min-height: 180px;
+}
+
+.cta-shell {
+  margin-top: 8px;
+}
+
+.cta-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 30px;
+}
+
+.cta-panel p {
+  margin-top: 14px;
+  max-width: 58ch;
+}
+
+.cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+footer {
+  border-top: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(248, 251, 255, 0.82);
+}
+
+.footer-inner {
+  padding: 18px 0 24px;
+}
+
+.footer-copy {
+  margin: 0;
+  color: var(--prelog-muted);
+}
+
+.footer-links {
   justify-content: flex-end;
 }
 
-.small-btn{
-  padding: 8px 12px;
-  font-size: 12px;
+.footer-pill {
+  padding: 9px 12px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--prelog-muted);
+  cursor: pointer;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.46);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+}
+
+.modal {
+  width: min(540px, 100%);
+  max-height: 84vh;
+  overflow-y: auto;
+  padding: 24px;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 24px 50px rgba(15, 23, 42, 0.24);
+}
+
+.modal h3 {
+  margin: 0 0 12px;
+  font-size: 1.5rem;
+}
+
+.modal-copy {
+  margin: 0;
+  color: var(--prelog-muted);
+  line-height: 1.7;
+}
+
+.modal-copy-small {
+  font-size: 0.92rem;
+}
+
+.op-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.small-btn {
+  min-height: 40px;
+  padding: 0 14px;
+}
+
+@media (max-width: 1100px) {
+  .hero,
+  .feature-layout,
+  .two-up {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    gap: 24px;
+  }
+
+  .hero-copy h1 {
+    max-width: 12.5ch;
+  }
+
+  .note-top,
+  .note-bottom {
+    position: static;
+    max-width: none;
+    margin-top: 14px;
+  }
+
+  .workflow-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .impact-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .resource-grid,
+  .community-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cta-panel {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 780px) {
+  .desktop-nav {
+    display: none;
+  }
+
+  .hamburger,
+  .mobile-nav {
+    display: flex;
+  }
+
+  main.container {
+    padding-top: 24px;
+  }
+
+  .hero-copy h1 {
+    max-width: none;
+    font-size: clamp(2.4rem, 12vw, 3.4rem);
+  }
+
+  .hero-dashboard,
+  .section-shell,
+  .cta-panel,
+  .feature-dashboard {
+    padding: 22px;
+  }
+
+  .preview-summary,
+  .dashboard-panels,
+  .community-grid,
+  .resource-grid,
+  .workflow-grid,
+  .impact-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-dashboard-header,
+  .hero-dashboard-top,
+  .section-heading,
+  .footer-inner,
+  .cta-panel {
+    flex-direction: column;
+  }
+
+  .footer-links {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 560px) {
+  .container {
+    width: min(100% - 28px, 1220px);
+  }
+
+  .nav {
+    padding: 14px 0;
+  }
+
+  .brand {
+    font-size: 0.98rem;
+  }
+
+  .hero-meta,
+  .hero-ctas,
+  .cta-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .hero-dashboard,
+  .section-shell,
+  .cta-panel,
+  .feature-dashboard,
+  .impact-card,
+  .resource-card,
+  .workflow-card,
+  .feature-card,
+  .community-card,
+  .split-card,
+  .dashboard-panel {
+    padding: 18px;
+  }
 }
 </style>
-
-  
