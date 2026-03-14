@@ -364,6 +364,8 @@ function closeMenu() { isMenuOpen.value = false }
   --text:#0f172a;
   --accent:#2563eb;
   --accent-2:#14b8a6;
+  --prelog-blue:#1d4ed8;
+  --prelog-teal:#0f9d8a;
   --ring:rgba(37,99,235,.25);
   --card:#ffffff;
   --card-2:#f9fafb;
@@ -428,11 +430,14 @@ header{
   font-size:14px;
 }
 
-.navlinks a{
+.navlinks > a:not(.btn){
   color:var(--muted);
+  transition:color 0.2s ease;
 }
 
-.navlinks a:hover{
+.navlinks > a:not(.btn):hover,
+.navlinks > a:not(.btn).router-link-active,
+.navlinks > a:not(.btn).router-link-exact-active{
   color:var(--text);
 }
 
@@ -459,7 +464,7 @@ header{
 }
 
 .btn-primary{
-  background:linear-gradient(90deg, var(--accent), var(--accent-2));
+  background:linear-gradient(90deg, var(--prelog-blue), var(--prelog-teal));
   color:#fff;
   font-weight:700;
   border:none;
@@ -528,7 +533,7 @@ header{
   padding:16px 24px;
 }
 
-.mobile-nav a{
+.mobile-nav > a:not(.btn){
   color:var(--muted);
   padding:12px 0;
   font-size:14px;
@@ -536,11 +541,13 @@ header{
   transition:color 0.2s ease;
 }
 
-.mobile-nav a:last-child{
+.mobile-nav > a:not(.btn):last-child{
   border-bottom:none;
 }
 
-.mobile-nav a:hover{
+.mobile-nav > a:not(.btn):hover,
+.mobile-nav > a:not(.btn).router-link-active,
+.mobile-nav > a:not(.btn).router-link-exact-active{
   color:var(--text);
 }
 
