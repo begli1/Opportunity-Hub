@@ -179,16 +179,42 @@
               </button>
             </div>
 
-            <!-- Trending -->
-            <div class="section-header">
-              <h2>Featured Community Resources</h2>
-              <span class="muted small-text">
-                Based on what students around you are viewing
-              </span>
+            <!-- Opportunities -->
+            <div class="section-header section-header-split">
+              <div>
+                <h2>{{ opportunitySectionTitle }}</h2>
+                <span class="muted small-text">
+                  {{ opportunitySectionSubtitle }}
+                </span>
+              </div>
+
+              <div class="view-toggle" role="tablist" aria-label="Opportunity view">
+                <button
+                  v-for="view in opportunityViews"
+                  :key="view.id"
+                  class="view-toggle-btn"
+                  :data-active="activeOpportunityView === view.id"
+                  type="button"
+                  @click="activeOpportunityView = view.id"
+                >
+                  {{ view.label }}
+                </button>
+              </div>
             </div>
 
-            <div class="card-grid">
-              <article v-for="op in visibleTrending" :key="op.id" class="op-card">
+            <div v-if="displayedOpportunities.length === 0" class="empty-state-card">
+              <h3>{{ activeOpportunityView === 'for-you' ? 'Nothing in For You yet' : 'No opportunities found' }}</h3>
+              <p class="muted">
+                {{
+                  activeOpportunityView === 'for-you'
+                    ? 'Save a few opportunities for later and this view will start surfacing similar matches by type and tags.'
+                    : 'Try changing your search, filters, or advanced filter settings.'
+                }}
+              </p>
+            </div>
+
+            <div v-else class="card-grid">
+              <article v-for="op in displayedOpportunities" :key="op.id" class="op-card">
                 <div class="op-card-header">
                   <span class="badge">{{ op.type }}</span>
                   <button
@@ -859,6 +885,11 @@ const filters = [
   { id: 'tutor', label: 'Tutors' },
 ]
 const activeFilter = ref('all')
+const opportunityViews = [
+  { id: 'for-you', label: 'For You' },
+  { id: 'all', label: 'All Opportunities' },
+]
+const activeOpportunityView = ref('all')
 
 // search
 const searchQuery = ref('')
@@ -1213,6 +1244,69 @@ const visibleTrending = computed(() => {
   }
 
   return list
+})
+
+const forYouOpportunities = computed(() => {
+  if (savedList.value.length === 0) return []
+
+  const savedIds = new Set(savedList.value.map((op) => op.id))
+  const savedTypes = new Set(
+    savedList.value
+      .map((op) => String(op.type || '').trim().toLowerCase())
+      .filter(Boolean)
+  )
+  const savedOrgs = new Set(
+    savedList.value
+      .map((op) => String(op.org || '').trim().toLowerCase())
+      .filter(Boolean)
+  )
+  const savedTags = new Set(savedList.value.flatMap((op) => normalizeTags(op.tags)))
+
+  return visibleTrending.value
+    .map((op, index) => {
+      let score = 0
+      const typeKey = String(op.type || '').trim().toLowerCase()
+      const orgKey = String(op.org || '').trim().toLowerCase()
+      const opTags = normalizeTags(op.tags)
+
+      if (savedIds.has(op.id)) score += 100
+      if (savedTypes.has(typeKey)) score += 4
+      if (savedOrgs.has(orgKey)) score += 2
+
+      for (const tag of opTags) {
+        if (savedTags.has(tag)) score += 1
+      }
+
+      return { op, score, index }
+    })
+    .filter((entry) => entry.score > 0)
+    .sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score
+      return a.index - b.index
+    })
+    .map((entry) => entry.op)
+})
+
+const displayedOpportunities = computed(() =>
+  activeOpportunityView.value === 'for-you'
+    ? forYouOpportunities.value
+    : visibleTrending.value
+)
+
+const opportunitySectionTitle = computed(() =>
+  activeOpportunityView.value === 'for-you'
+    ? 'For You'
+    : 'All Opportunities'
+)
+
+const opportunitySectionSubtitle = computed(() => {
+  if (activeOpportunityView.value === 'for-you') {
+    return savedList.value.length === 0
+      ? 'Save opportunities for later to unlock personalized matches.'
+      : 'Matches based on the opportunities you saved for later.'
+  }
+
+  return 'Browse every opportunity that matches your current filters.'
 })
 
 /* ---------------------------
@@ -1765,6 +1859,14 @@ footer{
   gap:4px;
 }
 
+.section-header-split{
+  flex-direction:row;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:16px;
+  flex-wrap:wrap;
+}
+
 .section-header h2{
   font-size:18px;
   font-weight:700;
@@ -1778,6 +1880,54 @@ footer{
   display:grid;
   grid-template-columns: minmax(0, 1fr);
   gap:16px;
+}
+
+.view-toggle{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:4px;
+  border-radius:999px;
+  background:rgba(255,255,255,.8);
+  border:1px solid rgba(148,163,184,.18);
+  box-shadow:0 10px 24px rgba(15,23,42,.06);
+}
+
+.view-toggle-btn{
+  border:none;
+  background:transparent;
+  color:rgba(15,23,42,.6);
+  padding:9px 14px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+  transition:background .15s ease, color .15s ease, box-shadow .15s ease;
+}
+
+.view-toggle-btn[data-active="true"]{
+  background:linear-gradient(135deg, var(--accent), var(--accent-2));
+  color:#fff;
+  box-shadow:0 10px 22px rgba(37,99,235,.22);
+}
+
+.empty-state-card{
+  background:linear-gradient(135deg, rgba(255,255,255,.96), rgba(244,248,255,.96));
+  border-radius:var(--radius);
+  border:var(--border);
+  box-shadow:var(--shadow);
+  padding:24px;
+}
+
+.empty-state-card h3{
+  margin:0 0 8px;
+  font-size:18px;
+}
+
+.empty-state-card p{
+  margin:0;
+  max-width:560px;
+  line-height:1.6;
 }
 
 /* Opportunity cards */
