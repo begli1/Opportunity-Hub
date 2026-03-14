@@ -1197,6 +1197,118 @@ function normalizeTags(arr) {
     .filter(Boolean)
 }
 
+const RECOMMENDATION_STOP_WORDS = new Set([
+  'a', 'an', 'and', 'are', 'as', 'at', 'be', 'build', 'community', 'for', 'from', 'get',
+  'help', 'helps', 'in', 'into', 'is', 'it', 'job', 'jobs', 'local', 'near', 'of', 'on',
+  'opportun', 'opportunity', 'opportunities', 'or', 'our', 'program', 'programs', 'resource',
+  'resources', 'student', 'students', 'that', 'the', 'their', 'this', 'to', 'with', 'you',
+  'your'
+])
+
+function normalizePhrase(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function stemToken(token) {
+  let value = String(token || '').trim().toLowerCase()
+  if (value.length <= 3) return value
+  if (value.endsWith('ing') && value.length > 5) value = value.slice(0, -3)
+  else if (value.endsWith('ed') && value.length > 4) value = value.slice(0, -2)
+  else if (value.endsWith('ies') && value.length > 5) value = `${value.slice(0, -3)}y`
+  else if (value.endsWith('s') && !value.endsWith('ss') && value.length > 4) value = value.slice(0, -1)
+  return value
+}
+
+function tokenizeText(...parts) {
+  const tokens = []
+
+  for (const part of parts) {
+    const normalized = normalizePhrase(part)
+    if (!normalized) continue
+
+    for (const rawToken of normalized.split(' ')) {
+      const token = stemToken(rawToken)
+      if (!token || token.length < 3) continue
+      if (RECOMMENDATION_STOP_WORDS.has(token)) continue
+      tokens.push(token)
+    }
+  }
+
+  return [...new Set(tokens)]
+}
+
+function buildOpportunityFingerprint(op) {
+  const tagPhrases = normalizeTags(op.tags)
+  const tagTokens = tokenizeText(...tagPhrases)
+  const textTokens = tokenizeText(op.title, op.description, op.org, op.location)
+
+  return {
+    id: op.id,
+    saved: Boolean(op.saved),
+    type: String(op.type || '').trim().toLowerCase(),
+    org: normalizePhrase(op.org),
+    tagPhrases: new Set(tagPhrases),
+    tagTokens: new Set(tagTokens),
+    textTokens: new Set(textTokens),
+  }
+}
+
+function buildRarityMap(fingerprints, selector) {
+  const counts = new Map()
+  const total = Math.max(1, fingerprints.length)
+
+  for (const fingerprint of fingerprints) {
+    const uniqueValues = new Set(selector(fingerprint))
+    for (const value of uniqueValues) {
+      counts.set(value, (counts.get(value) || 0) + 1)
+    }
+  }
+
+  const rarity = new Map()
+  for (const [value, count] of counts.entries()) {
+    rarity.set(value, 1 + Math.log((total + 1) / (count + 1)))
+  }
+
+  return rarity
+}
+
+function scoreSetOverlap(sourceSet, candidateSet, rarityMap, multiplier) {
+  let score = 0
+  let matches = 0
+
+  for (const value of sourceSet) {
+    if (!candidateSet.has(value)) continue
+    score += (rarityMap.get(value) || 1) * multiplier
+    matches += 1
+  }
+
+  return { score, matches }
+}
+
+function scoreSavedSimilarity(source, candidate, rarity) {
+  if (source.id === candidate.id) {
+    return { total: 0, tagMatches: 0, keywordMatches: 0 }
+  }
+
+  const exactTag = scoreSetOverlap(source.tagPhrases, candidate.tagPhrases, rarity.tagPhrases, 8.5)
+  const tagToken = scoreSetOverlap(source.tagTokens, candidate.tagTokens, rarity.tokens, 4.2)
+  const tagIntoText = scoreSetOverlap(source.tagTokens, candidate.textTokens, rarity.tokens, 2.6)
+  const keyword = scoreSetOverlap(source.textTokens, candidate.textTokens, rarity.tokens, 1.35)
+
+  const typeBonus = source.type && source.type === candidate.type ? 0.6 : 0
+  const orgBonus = source.org && source.org === candidate.org ? 0.4 : 0
+
+  return {
+    total: exactTag.score + tagToken.score + tagIntoText.score + keyword.score + typeBonus + orgBonus,
+    tagMatches: exactTag.matches + tagToken.matches + tagIntoText.matches,
+    keywordMatches: keyword.matches,
+  }
+}
+
 function tryParseDeadline(s) {
   if (!s) return null
   const raw = String(s).split('/')[0].trim()
@@ -1249,39 +1361,49 @@ const visibleTrending = computed(() => {
 const forYouOpportunities = computed(() => {
   if (savedList.value.length === 0) return []
 
-  const savedIds = new Set(savedList.value.map((op) => op.id))
-  const savedTypes = new Set(
-    savedList.value
-      .map((op) => String(op.type || '').trim().toLowerCase())
-      .filter(Boolean)
-  )
-  const savedOrgs = new Set(
-    savedList.value
-      .map((op) => String(op.org || '').trim().toLowerCase())
-      .filter(Boolean)
-  )
-  const savedTags = new Set(savedList.value.flatMap((op) => normalizeTags(op.tags)))
+  const corpus = [...visibleTrending.value, ...savedList.value]
+  const fingerprints = corpus.map(buildOpportunityFingerprint)
+  const fingerprintById = new Map(fingerprints.map((fingerprint) => [fingerprint.id, fingerprint]))
+  const savedFingerprints = savedList.value
+    .map((op) => fingerprintById.get(op.id))
+    .filter(Boolean)
+
+  const rarity = {
+    tagPhrases: buildRarityMap(fingerprints, (fingerprint) => fingerprint.tagPhrases),
+    tokens: buildRarityMap(fingerprints, (fingerprint) => [
+      ...fingerprint.tagTokens,
+      ...fingerprint.textTokens,
+    ]),
+  }
 
   return visibleTrending.value
     .map((op, index) => {
-      let score = 0
-      const typeKey = String(op.type || '').trim().toLowerCase()
-      const orgKey = String(op.org || '').trim().toLowerCase()
-      const opTags = normalizeTags(op.tags)
+      const candidate = fingerprintById.get(op.id)
+      const matches = savedFingerprints
+        .map((savedFingerprint) => scoreSavedSimilarity(savedFingerprint, candidate, rarity))
+        .filter((match) => match.total > 0)
+        .sort((a, b) => b.total - a.total)
 
-      if (savedIds.has(op.id)) score += 100
-      if (savedTypes.has(typeKey)) score += 4
-      if (savedOrgs.has(orgKey)) score += 2
+      const topMatches = matches.slice(0, 3)
+      const baseScore = topMatches.reduce((sum, match) => sum + match.total, 0)
+      const totalTagMatches = topMatches.reduce((sum, match) => sum + match.tagMatches, 0)
+      const totalKeywordMatches = topMatches.reduce((sum, match) => sum + match.keywordMatches, 0)
+      const multiMatchBonus = Math.max(0, topMatches.length - 1) * 2.4
+      const freshnessBonus = Math.max(0, 1.2 - index * 0.03)
+      const savedPenalty = op.saved ? 1.75 : 0
 
-      for (const tag of opTags) {
-        if (savedTags.has(tag)) score += 1
+      return {
+        op,
+        index,
+        score: baseScore + multiMatchBonus + freshnessBonus - savedPenalty,
+        tagMatches: totalTagMatches,
+        keywordMatches: totalKeywordMatches,
       }
-
-      return { op, score, index }
     })
-    .filter((entry) => entry.score > 0)
+    .filter((entry) => entry.score >= 6 && (entry.tagMatches > 0 || entry.keywordMatches >= 2))
     .sort((a, b) => {
       if (b.score !== a.score) return b.score - a.score
+      if (a.op.saved !== b.op.saved) return Number(a.op.saved) - Number(b.op.saved)
       return a.index - b.index
     })
     .map((entry) => entry.op)
