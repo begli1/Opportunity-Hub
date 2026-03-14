@@ -446,7 +446,7 @@ function closeMenu() { isMenuOpen.value = false }
   --bg-soft:#eef2ff;
   --panel:#ffffff;
   --panel-elevated:#ffffff;
-  --muted:#000000;
+  --muted:#475569;
   --text:#0f172a;
   --accent:#2563eb;
   --accent-2:#14b8a6;
