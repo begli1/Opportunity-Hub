@@ -98,14 +98,6 @@
               :src="heroImage"
               alt="Students exploring future opportunities together"
             />
-            <div class="hero-image-caption">
-              <span class="panel-label">Student opportunities</span>
-              <h2>A clearer, more accessible hub for discovery</h2>
-              <p>
-                Opportunity Hub gives students one modern place to explore community resources
-                without sorting through scattered announcements.
-              </p>
-            </div>
           </div>
         </div>
       </section>
