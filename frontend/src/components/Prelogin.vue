@@ -1,8 +1,9 @@
 <template>
   <div class="prelog">
     <header>
-      <div class="container nav">
-        <a class="brand" href="#" @click.prevent="scrollToTop">
+      <div class="container">
+        <nav class="nav">
+        <RouterLink to="/" class="brand">
           <svg viewBox="0 0 64 64" aria-hidden="true">
             <defs>
               <linearGradient id="oh-brand-gradient" x1="0" y1="0" x2="1" y2="1">
@@ -17,29 +18,33 @@
             <circle cx="44" cy="18" r="1.5" fill="url(#oh-brand-gradient)" />
           </svg>
           Opportunity Hub
-        </a>
+        </RouterLink>
 
-        <nav class="navlinks desktop-nav" aria-label="Primary">
+        <div class="desktop-nav">
+          <div class="navlinks">
+          <RouterLink to="/">Home</RouterLink>
           <RouterLink to="/about">About Us</RouterLink>
           <RouterLink to="/references">References</RouterLink>
+          </div>
           <RouterLink class="btn btn-primary" to="/signup">Sign up</RouterLink>
           <RouterLink class="btn btn-outline" to="/login">Log in</RouterLink>
-        </nav>
+        </div>
 
         <button
           class="hamburger"
           :class="{ active: isMenuOpen }"
           @click="toggleMenu"
           aria-label="Toggle menu"
-          :aria-expanded="isMenuOpen ? 'true' : 'false'"
         >
           <span class="bar"></span>
           <span class="bar"></span>
           <span class="bar"></span>
         </button>
+        </nav>
       </div>
 
-      <nav class="mobile-nav" :class="{ active: isMenuOpen }" aria-label="Mobile">
+      <nav class="mobile-nav" :class="{ active: isMenuOpen }">
+        <RouterLink to="/" @click="closeMenu">Home</RouterLink>
         <RouterLink to="/about" @click="closeMenu">About Us</RouterLink>
         <RouterLink to="/references" @click="closeMenu">References</RouterLink>
         <div class="mobile-nav-buttons">
@@ -87,90 +92,20 @@
         </div>
 
         <div class="hero-visual">
-          <div class="hero-dashboard">
-            <div class="hero-dashboard-top">
-              <div>
-                <p class="panel-label">Preview</p>
-                <h2>Opportunity dashboard</h2>
-              </div>
-              <span class="status-pill">Signed out view</span>
+          <div class="hero-image-shell">
+            <img
+              class="hero-image"
+              :src="heroImage"
+              alt="Students exploring future opportunities together"
+            />
+            <div class="hero-image-caption">
+              <span class="panel-label">Student opportunities</span>
+              <h2>A clearer, more accessible hub for discovery</h2>
+              <p>
+                Opportunity Hub gives students one modern place to explore community resources
+                without sorting through scattered announcements.
+              </p>
             </div>
-
-            <div class="preview-search" role="search" aria-labelledby="demo-search-label">
-              <label id="demo-search-label" class="sr-only" for="demo-search">
-                Search the example opportunity feed
-              </label>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M21 21l-4.2-4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-                <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.8" />
-              </svg>
-              <input
-                id="demo-search"
-                v-model="query"
-                type="text"
-                placeholder="Search internships, tutoring, or volunteering"
-                autocomplete="off"
-              />
-            </div>
-
-            <div class="preview-summary">
-              <div class="summary-card">
-                <span class="summary-label">Saved</span>
-                <strong>12</strong>
-              </div>
-              <div class="summary-card">
-                <span class="summary-label">In progress</span>
-                <strong>4</strong>
-              </div>
-              <div class="summary-card">
-                <span class="summary-label">New this week</span>
-                <strong>8</strong>
-              </div>
-            </div>
-
-            <div class="filter-row">
-              <button
-                v-for="filter in previewFilters"
-                :key="filter.key"
-                class="filter-pill"
-                :class="{ active: activeFilter === filter.key }"
-                type="button"
-                :aria-pressed="String(activeFilter === filter.key)"
-                @click="setFilter(filter.key)"
-              >
-                {{ filter.label }}
-              </button>
-            </div>
-
-            <div class="preview-cards" aria-live="polite">
-              <article v-for="card in filteredCards" :key="card.id" class="preview-card">
-                <div class="preview-card-top">
-                  <span class="preview-tag">{{ card.organization }}</span>
-                  <span class="preview-type">{{ card.label }}</span>
-                </div>
-                <h3>{{ card.title }}</h3>
-                <p>{{ card.desc }}</p>
-                <div class="preview-card-meta">
-                  <span>{{ card.meta }}</span>
-                  <span>{{ card.location }}</span>
-                </div>
-              </article>
-
-              <article v-if="filteredCards.length === 0" class="preview-card preview-card-empty">
-                <h3>No matching preview results</h3>
-                <p>Try a different term or switch categories to see more example opportunities.</p>
-              </article>
-            </div>
-          </div>
-
-          <div class="floating-note note-top">
-            <strong>Trusted sources</strong>
-            <span>Schools, clubs, and community organizations can share opportunities in one place.</span>
-          </div>
-
-          <div class="floating-note note-bottom">
-            <strong>Built for action</strong>
-            <span>Save opportunities, track applications, and return to your dashboard later.</span>
           </div>
         </div>
       </section>
@@ -361,123 +296,23 @@
     </main>
 
     <footer>
-      <div class="container">
-        <div class="footer-inner">
-          <p class="footer-copy">
-            Copyright {{ year }} Opportunity Hub. Built by students, for students.
-          </p>
-          <div class="footer-links">
-            <RouterLink class="footer-pill" to="/about">About Us</RouterLink>
-            <RouterLink class="footer-pill" to="/references">References</RouterLink>
-            <button class="footer-pill" type="button" @click="openPrivacy">Privacy</button>
-            <button class="footer-pill" type="button" @click="openContact">Contact</button>
-          </div>
+      <div class="container footer-inner">
+        <p class="muted small-text">Copyright {{ year }} Opportunity Hub · TSA Webmaster {{ year }}</p>
+        <div class="footer-links">
+          <RouterLink to="/about">About Us</RouterLink>
+          <RouterLink to="/references">References</RouterLink>
         </div>
       </div>
     </footer>
-
-    <div v-if="isPrivacyOpen" class="modal-backdrop" @click.self="isPrivacyOpen = false">
-      <div class="modal">
-        <h3>Privacy</h3>
-        <p class="modal-copy">
-          Opportunity Hub stores your account information and the posts you create. Applications
-          you submit are visible to the creator of that post. Password protection is handled with
-          hashing and salting techniques, and your data is not sold.
-        </p>
-        <div class="op-actions">
-          <button class="btn btn-primary small-btn" type="button" @click="isPrivacyOpen = false">
-            Done
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div v-if="isContactOpen" class="modal-backdrop" @click.self="isContactOpen = false">
-      <div class="modal">
-        <h3>Contact</h3>
-        <p class="modal-copy modal-copy-small">Please sign in to send us a message.</p>
-        <div class="op-actions">
-          <button class="btn btn-ghost small-btn" type="button" @click="isContactOpen = false">
-            Close
-          </button>
-          <RouterLink class="btn btn-primary small-btn" to="/login" @click="isContactOpen = false">
-            Sign In
-          </RouterLink>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
 <script setup>
 import { computed, onMounted, ref } from 'vue';
 import AxiosInstance from '@/apiClient';
+import heroImage from '@/assets/hero_image.jpg';
 
-const query = ref('');
-const activeFilter = ref('all');
 const isMenuOpen = ref(false);
-
-const previewFilters = [
-  { key: 'all', label: 'All' },
-  { key: 'internships', label: 'Internships' },
-  { key: 'volunteering', label: 'Volunteering' },
-  { key: 'clubs', label: 'Clubs' },
-  { key: 'tutoring', label: 'Tutoring' },
-  { key: 'leadership', label: 'Leadership' }
-];
-
-const cards = ref([
-  {
-    id: 1,
-    category: 'internships',
-    label: 'Internship',
-    organization: 'City Innovation Lab',
-    title: 'Summer design and tech internship',
-    desc: 'A student-friendly internship focused on digital projects, collaboration, and portfolio growth.',
-    meta: 'Application closes April 12',
-    location: 'Hybrid'
-  },
-  {
-    id: 2,
-    category: 'volunteering',
-    label: 'Volunteer',
-    organization: 'Community Food Network',
-    title: 'Weekend service hours program',
-    desc: 'Join local food distribution events and earn verified volunteer hours through supervised shifts.',
-    meta: 'Flexible scheduling',
-    location: 'On site'
-  },
-  {
-    id: 3,
-    category: 'clubs',
-    label: 'Club',
-    organization: 'Student Leadership Council',
-    title: 'Campus leadership and service club',
-    desc: 'Plan school initiatives, coordinate events, and build leadership experience with peers.',
-    meta: 'Meets every Tuesday',
-    location: 'School based'
-  },
-  {
-    id: 4,
-    category: 'tutoring',
-    label: 'Tutoring',
-    organization: 'Academic Support Center',
-    title: 'Peer tutoring for math and science',
-    desc: 'Students can request help or sign up to tutor classmates in core subjects after school.',
-    meta: 'Open weekly',
-    location: 'In person'
-  },
-  {
-    id: 5,
-    category: 'leadership',
-    label: 'Leadership',
-    organization: 'Youth Advisory Board',
-    title: 'Youth advisory board applications',
-    desc: 'Contribute ideas, represent student voices, and work with community partners on local initiatives.',
-    meta: 'Interview required',
-    location: 'District wide'
-  }
-]);
 
 const resourceCategories = [
   {
@@ -599,32 +434,12 @@ const impactStats = computed(() => [
   }
 ]);
 
-const filteredCards = computed(() => {
-  const q = query.value.trim().toLowerCase();
-
-  return cards.value.filter((card) => {
-    const matchesFilter = activeFilter.value === 'all' || card.category === activeFilter.value;
-    const matchesQuery =
-      !q ||
-      card.title.toLowerCase().includes(q) ||
-      card.desc.toLowerCase().includes(q) ||
-      card.organization.toLowerCase().includes(q) ||
-      card.label.toLowerCase().includes(q);
-
-    return matchesFilter && matchesQuery;
-  });
-});
-
 function toggleMenu() {
   isMenuOpen.value = !isMenuOpen.value;
 }
 
 function closeMenu() {
   isMenuOpen.value = false;
-}
-
-function setFilter(key) {
-  activeFilter.value = key;
 }
 
 function scrollToSection(sectionId) {
@@ -635,12 +450,6 @@ function scrollToSection(sectionId) {
     window.history.replaceState(null, '', `#${sectionId}`);
   }
 
-  closeMenu();
-}
-
-function scrollToTop() {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  window.history.replaceState(null, '', window.location.pathname);
   closeMenu();
 }
 
@@ -655,19 +464,6 @@ onMounted(async () => {
     opportunityCount.value = null;
   }
 });
-
-const isPrivacyOpen = ref(false);
-const isContactOpen = ref(false);
-
-function openPrivacy() {
-  isPrivacyOpen.value = true;
-  closeMenu();
-}
-
-function openContact() {
-  isContactOpen.value = true;
-  closeMenu();
-}
 </script>
 
 <style scoped>
@@ -721,55 +517,53 @@ input {
 }
 
 .container {
-  width: min(1220px, calc(100% - 40px));
+  max-width: 1200px;
   margin: 0 auto;
+  padding: 24px 24px 32px;
 }
 
 header {
   position: sticky;
   top: 0;
   z-index: 30;
-  background: rgba(248, 251, 255, 0.85);
-  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-  backdrop-filter: blur(16px);
+  background: rgba(248, 250, 252, 0.86);
+  backdrop-filter: blur(12px);
 }
 
 .nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 18px;
-  padding: 18px 0;
+  gap: 16px;
 }
 
 .brand {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 1.05rem;
-  font-weight: 700;
-  letter-spacing: 0.01em;
+  gap: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  font-size: 18px;
 }
 
 .brand svg {
-  width: 34px;
-  height: 34px;
-  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
 }
 
 .navlinks {
   display: flex;
-  align-items: center;
   gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 14px;
 }
 
-.navlinks a:not(.btn) {
+.navlinks a {
   color: var(--prelog-muted);
-  font-size: 0.95rem;
-  transition: color 0.2s ease;
 }
 
-.navlinks a:not(.btn):hover,
+.navlinks a:hover,
 .mobile-nav a:hover {
   color: var(--prelog-text);
 }
@@ -779,48 +573,46 @@ header {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 44px;
-  padding: 0 18px;
-  border: 1px solid rgba(148, 163, 184, 0.35);
+  padding: 10px 16px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: linear-gradient(180deg, #ffffff, #eef2ff);
   color: var(--prelog-text);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.55) inset;
+  font-size: 14px;
   cursor: pointer;
   transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease,
-    border-color 0.18s ease,
-    background 0.18s ease;
+    transform 0.12s ease,
+    box-shadow 0.12s ease,
+    background 0.12s ease,
+    border-color 0.12s ease;
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
 }
 
 .btn:hover {
   transform: translateY(-1px);
-  box-shadow: var(--prelog-shadow-soft);
-  border-color: rgba(15, 23, 42, 0.14);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+  border-color: rgba(148, 163, 184, 0.9);
 }
 
 .btn:focus-visible,
-.filter-pill:focus-visible,
-.footer-pill:focus-visible,
 .hamburger:focus-visible {
   outline: 3px solid rgba(29, 78, 216, 0.22);
   outline-offset: 2px;
 }
 
 .btn-primary {
-  border: none;
+  background: linear-gradient(90deg, var(--prelog-blue), var(--prelog-teal));
   color: #ffffff;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--prelog-blue), var(--prelog-teal));
+  border: none;
 }
 
 .btn-primary:hover {
-  box-shadow: 0 18px 32px rgba(29, 78, 216, 0.24);
+  box-shadow: 0 14px 28px rgba(37, 99, 235, 0.28);
 }
 
 .btn-outline {
-  background: rgba(255, 255, 255, 0.92);
+  background: #ffffff;
 }
 
 .btn-ghost {
@@ -830,28 +622,26 @@ header {
 .hamburger {
   display: none;
   flex-direction: column;
-  justify-content: center;
-  gap: 5px;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.75);
+  background: transparent;
+  border: none;
   cursor: pointer;
+  padding: 8px;
+  gap: 5px;
+  z-index: 101;
 }
 
 .bar {
-  width: 20px;
-  height: 2px;
-  margin: 0 auto;
-  border-radius: 999px;
-  background: var(--prelog-text);
-  transition: transform 0.28s ease, opacity 0.28s ease;
+  display: block;
+  width: 25px;
+  height: 3px;
+  background-color: var(--prelog-text);
+  border-radius: 2px;
+  transition: all 0.3s ease-in-out;
+  margin: 0;
 }
 
 .hamburger.active .bar:nth-child(1) {
-  transform: translateY(7px) rotate(45deg);
+  transform: translateY(8px) rotate(45deg);
 }
 
 .hamburger.active .bar:nth-child(2) {
@@ -859,41 +649,53 @@ header {
 }
 
 .hamburger.active .bar:nth-child(3) {
-  transform: translateY(-7px) rotate(-45deg);
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+.desktop-nav {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
 .mobile-nav {
   display: none;
   flex-direction: column;
   gap: 0;
-  padding: 0 20px;
+  background: rgba(248, 250, 252, 0.95);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(148, 163, 184, 0.25);
+  padding: 0 24px;
   max-height: 0;
   overflow: hidden;
-  background: rgba(248, 251, 255, 0.96);
-  border-top: 1px solid rgba(148, 163, 184, 0.16);
-  transition: max-height 0.3s ease, padding 0.3s ease;
+  transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
 }
 
 .mobile-nav.active {
-  max-height: 320px;
-  padding: 12px 20px 18px;
+  max-height: 500px;
+  padding: 16px 24px;
 }
 
 .mobile-nav a {
   padding: 12px 0;
   color: var(--prelog-muted);
-  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  font-size: 14px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
 }
 
 .mobile-nav-buttons {
+  margin-top: 16px;
+  padding-top: 16px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding-top: 14px;
+  border-top: 1px solid rgba(148, 163, 184, 0.25);
 }
 
 .mobile-nav-buttons .btn {
   width: 100%;
+  text-align: center;
+  justify-content: center;
 }
 
 main.container {
@@ -999,10 +801,10 @@ main.container {
 
 .hero-visual {
   position: relative;
-  padding: 20px 0;
+  padding: 8px 0;
 }
 
-.hero-dashboard,
+.hero-image-shell,
 .section-shell,
 .cta-panel {
   position: relative;
@@ -1013,7 +815,7 @@ main.container {
   box-shadow: var(--prelog-shadow);
 }
 
-.hero-dashboard::before,
+.hero-image-shell::before,
 .section-shell::before,
 .cta-panel::before {
   content: "";
@@ -1025,11 +827,6 @@ main.container {
   pointer-events: none;
 }
 
-.hero-dashboard {
-  padding: 24px;
-}
-
-.hero-dashboard-top,
 .feature-dashboard-header,
 .section-heading,
 .footer-inner {
@@ -1039,168 +836,41 @@ main.container {
   gap: 18px;
 }
 
-.hero-dashboard-top h2,
+.hero-image-caption h2,
 .section-heading h2,
 .section-copy h2,
 .cta-panel h2 {
   margin: 6px 0 0;
 }
 
-.hero-dashboard-top h2 {
-  font-size: 1.55rem;
-}
-
-.status-pill,
-.feature-pill,
-.preview-tag,
-.preview-type,
-.footer-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  font-size: 0.78rem;
-}
-
-.status-pill {
-  padding: 8px 12px;
-  background: rgba(15, 23, 42, 0.04);
-  color: var(--prelog-muted);
-}
-
-.status-pill-soft {
-  background: rgba(29, 78, 216, 0.1);
-  color: var(--prelog-blue);
-}
-
-.preview-search {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 20px;
-  padding: 14px 16px;
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  border-radius: 16px;
-  background: rgba(247, 250, 252, 0.88);
-  color: var(--prelog-muted);
-}
-
-.preview-search input {
-  flex: 1 1 auto;
-  border: none;
-  outline: none;
-  background: transparent;
-  color: var(--prelog-text);
-}
-
-.preview-search input::placeholder {
-  color: #94a3b8;
-}
-
-.preview-summary {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 16px;
-}
-
-.summary-card {
-  padding: 14px;
-  border-radius: 18px;
-  background: linear-gradient(180deg, #ffffff, #f5f8fd);
-  border: 1px solid rgba(148, 163, 184, 0.16);
-}
-
-.summary-card strong {
-  display: block;
-  margin-top: 6px;
-  font-size: 1.45rem;
-}
-
-.summary-label {
-  color: var(--prelog-muted);
-  font-size: 0.86rem;
-}
-
-.filter-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 18px;
-}
-
-.filter-pill {
-  padding: 9px 14px;
-  border: 1px solid rgba(148, 163, 184, 0.24);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.88);
-  color: var(--prelog-muted);
-  cursor: pointer;
-  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
-}
-
-.filter-pill:hover,
-.filter-pill.active {
-  transform: translateY(-1px);
-}
-
-.filter-pill.active {
-  border-color: transparent;
-  background: linear-gradient(135deg, var(--prelog-blue), var(--prelog-teal));
-  color: #ffffff;
-}
-
-.preview-cards {
-  display: grid;
-  gap: 12px;
-  margin-top: 18px;
-}
-
-.preview-card {
+.hero-image-shell {
   padding: 16px;
-  border-radius: 18px;
-  background: linear-gradient(180deg, #ffffff, #f7fafc);
-  border: 1px solid rgba(148, 163, 184, 0.16);
-  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
 
-.preview-card:hover,
-.resource-card:hover,
-.workflow-card:hover,
-.feature-card:hover,
-.community-card:hover,
-.impact-card:hover {
-  transform: translateY(-2px);
+.hero-image {
+  display: block;
+  width: 100%;
+  min-height: 520px;
+  object-fit: cover;
+  border-radius: 24px;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
+}
+
+.hero-image-caption {
+  position: absolute;
+  left: 38px;
+  right: 38px;
+  bottom: 34px;
+  max-width: 420px;
+  display: block;
+  padding: 22px 24px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.18);
   box-shadow: var(--prelog-shadow-soft);
-  border-color: rgba(29, 78, 216, 0.16);
 }
 
-.preview-card-top,
-.preview-card-meta,
-.footer-links {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.preview-tag,
-.preview-type {
-  padding: 6px 10px;
-}
-
-.preview-tag {
-  background: rgba(29, 78, 216, 0.08);
-  color: var(--prelog-blue);
-}
-
-.preview-type {
-  background: rgba(15, 23, 42, 0.05);
-  color: var(--prelog-muted);
-}
-
-.preview-card h3,
+.hero-image-caption h2,
 .resource-card h3,
 .workflow-card h3,
 .feature-card h3,
@@ -1211,46 +881,31 @@ main.container {
   margin: 10px 0 8px;
 }
 
-.preview-card-meta {
-  margin-top: 14px;
-  color: var(--prelog-muted);
-  font-size: 0.88rem;
-}
-
-.preview-card-empty p {
-  margin-top: 8px;
-}
-
-.floating-note {
-  position: absolute;
-  max-width: 220px;
-  padding: 14px 16px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid rgba(148, 163, 184, 0.16);
-  box-shadow: var(--prelog-shadow-soft);
-}
-
-.floating-note strong {
+.hero-image-caption h2 {
   display: block;
-  margin-bottom: 6px;
-  font-size: 0.95rem;
+  font-size: 1.55rem;
 }
 
-.floating-note span {
+.hero-image-caption p {
+  margin: 0;
   color: var(--prelog-muted);
-  line-height: 1.55;
-  font-size: 0.9rem;
+  line-height: 1.7;
 }
 
-.note-top {
-  top: -6px;
-  right: -8px;
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  background: rgba(15, 23, 42, 0.04);
+  color: var(--prelog-muted);
 }
 
-.note-bottom {
-  bottom: -4px;
-  left: -10px;
+.status-pill-soft {
+  background: rgba(29, 78, 216, 0.1);
+  color: var(--prelog-blue);
 }
 
 .impact-strip {
@@ -1407,6 +1062,15 @@ main.container {
   font-size: 1.45rem;
 }
 
+.dashboard-label,
+.dashboard-panel strong {
+  display: block;
+}
+
+.dashboard-label {
+  margin-bottom: 8px;
+}
+
 .dashboard-panels {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1477,78 +1141,39 @@ main.container {
 }
 
 footer {
-  border-top: 1px solid rgba(148, 163, 184, 0.18);
-  background: rgba(248, 251, 255, 0.82);
+  padding: 20px 0;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+  background: #ffffff;
 }
 
 .footer-inner {
-  padding: 18px 0 24px;
-}
-
-.footer-copy {
-  margin: 0;
-  color: var(--prelog-muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .footer-links {
-  justify-content: flex-end;
-}
-
-.footer-pill {
-  padding: 9px 12px;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  background: rgba(255, 255, 255, 0.7);
-  color: var(--prelog-muted);
-  cursor: pointer;
-}
-
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  background: rgba(15, 23, 42, 0.46);
-  backdrop-filter: blur(8px);
-  z-index: 1000;
+  gap: 20px;
 }
 
-.modal {
-  width: min(540px, 100%);
-  max-height: 84vh;
-  overflow-y: auto;
-  padding: 24px;
-  border-radius: 22px;
-  background: #ffffff;
-  box-shadow: 0 24px 50px rgba(15, 23, 42, 0.24);
-}
-
-.modal h3 {
-  margin: 0 0 12px;
-  font-size: 1.5rem;
-}
-
-.modal-copy {
-  margin: 0;
+.footer-links a {
   color: var(--prelog-muted);
-  line-height: 1.7;
+  font-size: 13px;
 }
 
-.modal-copy-small {
-  font-size: 0.92rem;
+.footer-links a:hover {
+  color: var(--prelog-blue);
 }
 
-.op-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
+.muted {
+  color: var(--prelog-muted);
 }
 
-.small-btn {
-  min-height: 40px;
-  padding: 0 14px;
+.small-text {
+  font-size: 13px;
 }
 
 @media (max-width: 1100px) {
@@ -1564,13 +1189,6 @@ footer {
 
   .hero-copy h1 {
     max-width: 12.5ch;
-  }
-
-  .note-top,
-  .note-bottom {
-    position: static;
-    max-width: none;
-    margin-top: 14px;
   }
 
   .workflow-grid {
@@ -1592,7 +1210,7 @@ footer {
   }
 }
 
-@media (max-width: 780px) {
+@media (max-width: 640px) {
   .desktop-nav {
     display: none;
   }
@@ -1611,14 +1229,13 @@ footer {
     font-size: clamp(2.4rem, 12vw, 3.4rem);
   }
 
-  .hero-dashboard,
+  .hero-image-shell,
   .section-shell,
   .cta-panel,
   .feature-dashboard {
     padding: 22px;
   }
 
-  .preview-summary,
   .dashboard-panels,
   .community-grid,
   .resource-grid,
@@ -1628,7 +1245,6 @@ footer {
   }
 
   .feature-dashboard-header,
-  .hero-dashboard-top,
   .section-heading,
   .footer-inner,
   .cta-panel {
@@ -1642,7 +1258,7 @@ footer {
 
 @media (max-width: 560px) {
   .container {
-    width: min(100% - 28px, 1220px);
+    padding: 18px 16px 28px;
   }
 
   .nav {
@@ -1664,7 +1280,7 @@ footer {
     width: 100%;
   }
 
-  .hero-dashboard,
+  .hero-image-shell,
   .section-shell,
   .cta-panel,
   .feature-dashboard,
@@ -1675,6 +1291,17 @@ footer {
   .community-card,
   .split-card,
   .dashboard-panel {
+    padding: 18px;
+  }
+
+  .hero-image {
+    min-height: 360px;
+  }
+
+  .hero-image-caption {
+    left: 24px;
+    right: 24px;
+    bottom: 24px;
     padding: 18px;
   }
 }
