@@ -216,6 +216,14 @@ def compute_freshness_boost(created_at: Optional[datetime], now: datetime) -> fl
     return max(0.0, 2.4 - min(age_days, 21) * 0.11)
 
 
+def is_expired(opportunity: OpportunityOut, now: datetime) -> bool:
+    if opportunity.deadline_at is None:
+        return False
+    deadline = opportunity.deadline_at
+    deadline = deadline if deadline.tzinfo else deadline.replace(tzinfo=timezone.utc)
+    return deadline < now
+
+
 def compute_cold_start_score(
     candidate: OpportunityFingerprint,
     now: datetime,
@@ -353,15 +361,16 @@ def recommend_for_user(
     featured_ids = featured_ids or set()
     preferred_location_tokens = frozenset(tokenize_text(preferred_location or ""))
     now = datetime.now(timezone.utc)
+    active_opportunities = [opportunity for opportunity in opportunities if not is_expired(opportunity, now)]
 
     candidate_fingerprints = {
         opportunity.id: build_fingerprint(opportunity, popularity_by_id, featured_ids)
-        for opportunity in opportunities
+        for opportunity in active_opportunities
     }
 
     if not saved_posts:
         cold_ranked = sorted(
-            opportunities,
+            active_opportunities,
             key=lambda opportunity: compute_cold_start_score(
                 candidate_fingerprints[opportunity.id],
                 now,
@@ -379,7 +388,7 @@ def recommend_for_user(
     rarity = build_rarity_maps(list(candidate_fingerprints.values()) + saved_fingerprints)
 
     scored_items: list[tuple[OpportunityOut, OpportunityFingerprint, float, dict[str, float]]] = []
-    for opportunity in opportunities:
+    for opportunity in active_opportunities:
         fingerprint = candidate_fingerprints[opportunity.id]
         score, breakdown = score_candidate(
             fingerprint,

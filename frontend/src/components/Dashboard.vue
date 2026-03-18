@@ -216,7 +216,10 @@
             <div v-else class="card-grid">
               <article v-for="op in displayedOpportunities" :key="op.id" class="op-card">
                 <div class="op-card-header">
-                  <span class="badge">{{ op.type }}</span>
+                  <div class="op-card-badges">
+                    <span class="badge">{{ op.type }}</span>
+                    <span v-if="isOpportunityExpired(op)" class="status-badge status-badge-closed">Closed</span>
+                  </div>
                   <button
                     class="icon-btn"
                     :aria-label="op.saved ? 'Unsave' : 'Save for later'"
@@ -259,16 +262,24 @@
                   </button>
 
                   <button
-                    v-if="op.allow_apply"
+                    v-if="op.allow_apply && !isOpportunityExpired(op)"
                     class="btn btn-primary small-btn"
                     type="button"
                     @click="openApply(op)"
                   >
                     Apply
                   </button>
+                  <button
+                    v-else-if="op.allow_apply && isOpportunityExpired(op)"
+                    class="btn btn-outline small-btn closed-btn"
+                    type="button"
+                    disabled
+                  >
+                    Closed
+                  </button>
 
                   <a
-                    v-if="op.allow_external_apply && op.external_apply_url && op.external_url_approved === true"
+                    v-if="op.allow_external_apply && op.external_apply_url && op.external_url_approved === true && !isOpportunityExpired(op)"
                     class="btn btn-outline small-btn"
                     :href="op.external_apply_url"
                     target="_blank"
@@ -1044,6 +1055,12 @@ function daysUntil(date) {
   return Math.round((startOfDay(date).getTime() - startOfDay(new Date()).getTime()) / msPerDay)
 }
 
+function isOpportunityExpired(op) {
+  const deadlineDate = getOpportunityDeadlineDate(op)
+  if (!deadlineDate) return false
+  return deadlineDate.getTime() < startOfDay(new Date()).getTime()
+}
+
 function formatShortDate(value) {
   return new Date(value).toLocaleDateString(undefined, {
     month: 'short',
@@ -1398,13 +1415,27 @@ function applyAdvancedFilters(list) {
     filtered = filtered.filter((op) => Boolean(op.allow_external_apply && op.external_apply_url && op.external_url_approved === true))
   }
 
-  if (a.sort === 'org') {
-    filtered.sort((x, y) => String(x.org || '').localeCompare(String(y.org || '')))
-  } else if (a.sort === 'deadline') {
+  const sortByOpenThen = (comparator) => {
     filtered.sort((x, y) => {
+      const expiredDelta = Number(isOpportunityExpired(x)) - Number(isOpportunityExpired(y))
+      if (expiredDelta !== 0) return expiredDelta
+      return comparator(x, y)
+    })
+  }
+
+  if (a.sort === 'org') {
+    sortByOpenThen((x, y) => String(x.org || '').localeCompare(String(y.org || '')))
+  } else if (a.sort === 'deadline') {
+    sortByOpenThen((x, y) => {
       const dx = x.deadline_at ? new Date(x.deadline_at).getTime() : Infinity
       const dy = y.deadline_at ? new Date(y.deadline_at).getTime() : Infinity
       return dx - dy
+    })
+  } else {
+    sortByOpenThen((x, y) => {
+      const dx = x.created_at ? new Date(x.created_at).getTime() : 0
+      const dy = y.created_at ? new Date(y.created_at).getTime() : 0
+      return dy - dx
     })
   }
 
@@ -2157,6 +2188,13 @@ footer{
   align-items:center;
 }
 
+.op-card-badges{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-items:center;
+}
+
 .row-inline{
   display:flex;
   align-items:center;
@@ -2173,6 +2211,20 @@ footer{
   background:rgba(37,99,235,.08);
   color:var(--accent);
   font-weight:600;
+}
+
+.status-badge{
+  font-size:11px;
+  padding:4px 8px;
+  border-radius:999px;
+  font-weight:700;
+  border:1px solid transparent;
+}
+
+.status-badge-closed{
+  background:linear-gradient(180deg, #f8fafc, #e2e8f0);
+  color:#475569;
+  border-color:rgba(100,116,139,.22);
 }
 
 .op-title{
@@ -2225,6 +2277,12 @@ footer{
   border-radius:999px;
   background:var(--card-2);
   border:1px solid rgba(148,163,184,.5);
+}
+
+.closed-btn{
+  opacity:.9;
+  cursor:not-allowed;
+  color:#64748b;
 }
 
 /* Sidebar */
