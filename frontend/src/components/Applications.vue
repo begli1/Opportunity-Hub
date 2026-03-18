@@ -798,13 +798,27 @@ footer{
 
 
 
-  .status-pill {
+.status-pill {
   padding: 6px 10px;
   border-radius: 999px;
   font-size: 12px;
   border: 1px solid rgba(0,0,0,0.08);
+  font-weight:700;
 }
-.status-pill[data-status="accepted"] { font-weight: 700; }
-.status-pill[data-status="rejected"] { font-weight: 700; }
+.status-pill[data-status="pending"] {
+  color:#a16207;
+  background:linear-gradient(180deg, #fffbeb, #fef3c7);
+  border-color:rgba(234,179,8,.35);
+}
+.status-pill[data-status="accepted"] {
+  color:#166534;
+  background:linear-gradient(180deg, #f0fdf4, #dcfce7);
+  border-color:rgba(34,197,94,.3);
+}
+.status-pill[data-status="rejected"] {
+  color:#b91c1c;
+  background:linear-gradient(180deg, #fef2f2, #fee2e2);
+  border-color:rgba(239,68,68,.3);
+}
   </style>
   

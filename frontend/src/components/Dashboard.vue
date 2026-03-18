@@ -286,6 +286,35 @@
 
           <!-- Sidebar -->
           <aside class="sidebar">
+            <section class="sidebar-section" v-if="activeDeadlineAlerts.length">
+              <div class="sidebar-heading">
+                <h3>Deadline reminders</h3>
+                <span class="sidebar-count">{{ activeDeadlineAlerts.length }}</span>
+              </div>
+
+              <div class="deadline-alert-list">
+                <article
+                  v-for="alert in activeDeadlineAlerts"
+                  :key="alert.key"
+                  class="deadline-alert"
+                  :data-urgency="alert.urgency"
+                >
+                  <div>
+                    <p class="deadline-alert-title">{{ alert.title }}</p>
+                    <p class="deadline-alert-text">{{ alert.message }}</p>
+                  </div>
+                  <button
+                    class="alert-dismiss"
+                    type="button"
+                    @click="dismissDeadlineAlert(alert.key)"
+                    aria-label="Dismiss deadline reminder"
+                  >
+                    ×
+                  </button>
+                </article>
+              </div>
+            </section>
+
             <section class="sidebar-section">
               <h3>Quick actions</h3>
               <div class="sidebar-actions">
@@ -322,6 +351,58 @@
                   </button>
                 </li>
               </ul>
+            </section>
+
+            <section class="sidebar-section">
+              <div class="sidebar-heading">
+                <h3>Deadline calendar</h3>
+                <div class="calendar-controls">
+                  <button class="calendar-nav-btn" type="button" @click="shiftCalendarMonth(-1)">&lt;</button>
+                  <span class="calendar-label">{{ calendarMonthLabel }}</span>
+                  <button class="calendar-nav-btn" type="button" @click="shiftCalendarMonth(1)">&gt;</button>
+                </div>
+              </div>
+
+              <div v-if="calendarSavedDeadlines.length === 0" class="muted small-text">
+                Save opportunities with real deadlines to see them on your calendar.
+              </div>
+
+              <div v-else class="deadline-calendar">
+                <div class="calendar-weekdays">
+                  <span v-for="day in calendarWeekdays" :key="day">{{ day }}</span>
+                </div>
+
+                <div class="calendar-grid">
+                  <div
+                    v-for="day in calendarDays"
+                    :key="day.key"
+                    class="calendar-day"
+                    :data-current-month="day.isCurrentMonth"
+                    :data-has-deadline="day.deadlines.length > 0"
+                    :data-is-today="day.isToday"
+                  >
+                    <span class="calendar-date">{{ day.date.getDate() }}</span>
+                    <div class="calendar-markers">
+                      <span
+                        v-for="deadline in day.deadlines.slice(0, 3)"
+                        :key="deadline.id"
+                        class="calendar-marker"
+                        :title="`${deadline.title} • ${formatShortDate(deadline.deadlineDate)}`"
+                      ></span>
+                    </div>
+                  </div>
+                </div>
+
+                <ul class="calendar-deadline-list">
+                  <li v-for="item in visibleCalendarDeadlines" :key="item.key">
+                    <span class="calendar-deadline-date">{{ formatShortDate(item.deadlineDate) }}</span>
+                    <div>
+                      <p class="saved-title">{{ item.title }}</p>
+                      <p class="saved-meta">{{ item.type }} • {{ item.org }}</p>
+                    </div>
+                  </li>
+                </ul>
+              </div>
             </section>
           </aside>
         </section>
@@ -809,7 +890,9 @@ function closeMenu() {
 function onLogout() {
   clearToken()
   trending.value = []
+  forYouFeed.value = []
   savedList.value = []
+  dismissedDeadlineAlerts.value = new Set()
   userName.value = '...'
   router.push('/')
 }
@@ -907,6 +990,86 @@ function prettyType(t) {
 }
 
 const saved = computed(() => savedList.value)
+const calendarWeekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+const calendarMonth = ref(startOfMonth(new Date()))
+const dismissedDeadlineAlerts = ref(new Set())
+
+function startOfMonth(value) {
+  return new Date(value.getFullYear(), value.getMonth(), 1)
+}
+
+function startOfDay(value) {
+  const date = new Date(value)
+  date.setHours(0, 0, 0, 0)
+  return date
+}
+
+function formatDayKey(value) {
+  return startOfDay(value).toISOString().slice(0, 10)
+}
+
+function dismissedDeadlineStorageKey() {
+  return `opportunityhub.dismissed-deadlines.${user.value?.id || 'guest'}`
+}
+
+function loadDismissedDeadlineAlerts() {
+  try {
+    const raw = localStorage.getItem(dismissedDeadlineStorageKey())
+    const parsed = JSON.parse(raw || '[]')
+    return new Set(Array.isArray(parsed) ? parsed : [])
+  } catch {
+    return new Set()
+  }
+}
+
+function persistDismissedDeadlineAlerts() {
+  localStorage.setItem(
+    dismissedDeadlineStorageKey(),
+    JSON.stringify([...dismissedDeadlineAlerts.value])
+  )
+}
+
+function getOpportunityDeadlineDate(op) {
+  if (op?.deadline_at) {
+    const date = new Date(op.deadline_at)
+    if (!Number.isNaN(date.getTime())) return startOfDay(date)
+  }
+
+  const parsed = tryParseDeadline(op?.deadline_text)
+  return parsed ? startOfDay(parsed) : null
+}
+
+function daysUntil(date) {
+  const msPerDay = 1000 * 60 * 60 * 24
+  return Math.round((startOfDay(date).getTime() - startOfDay(new Date()).getTime()) / msPerDay)
+}
+
+function formatShortDate(value) {
+  return new Date(value).toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+  })
+}
+
+function buildReminderMessage(entry) {
+  if (entry.daysLeft === 0) return `Deadline is today for ${entry.title}.`
+  if (entry.daysLeft === 1) return `There is 1 day left to apply to ${entry.title}.`
+  if (entry.daysLeft === 7) return `There is 1 week left to apply to ${entry.title}.`
+  return `There are ${entry.daysLeft} days left to apply to ${entry.title}.`
+}
+
+function dismissDeadlineAlert(key) {
+  dismissedDeadlineAlerts.value = new Set([...dismissedDeadlineAlerts.value, key])
+  persistDismissedDeadlineAlerts()
+}
+
+function shiftCalendarMonth(offset) {
+  calendarMonth.value = new Date(
+    calendarMonth.value.getFullYear(),
+    calendarMonth.value.getMonth() + offset,
+    1
+  )
+}
 
 function normalizeOpportunityList(ops) {
   const savedIds = new Set(savedList.value.map((x) => x.id))
@@ -933,6 +1096,7 @@ async function loadDashboard() {
     ...op,
     type: prettyType(op.type),
   }))
+  dismissedDeadlineAlerts.value = loadDismissedDeadlineAlerts()
 
   trending.value = normalizeOpportunityList(data.trending)
   forYouFeed.value = normalizeOpportunityList(data.for_you)
@@ -1249,6 +1413,88 @@ function applyAdvancedFilters(list) {
 
 const visibleTrending = computed(() => applyAdvancedFilters(trending.value))
 const visibleForYou = computed(() => applyAdvancedFilters(forYouFeed.value))
+const calendarSavedDeadlines = computed(() =>
+  savedList.value
+    .map((item) => {
+      const deadlineDate = getOpportunityDeadlineDate(item)
+      if (!deadlineDate) return null
+
+      return {
+        ...item,
+        deadlineDate,
+        key: `${item.id}:${formatDayKey(deadlineDate)}`,
+      }
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.deadlineDate - b.deadlineDate)
+)
+
+const activeDeadlineAlerts = computed(() =>
+  calendarSavedDeadlines.value
+    .map((item) => {
+      const daysLeft = daysUntil(item.deadlineDate)
+      if (daysLeft < 0 || daysLeft > 7) return null
+
+      const key = `${item.id}:${formatDayKey(item.deadlineDate)}`
+      if (dismissedDeadlineAlerts.value.has(key)) return null
+
+      return {
+        ...item,
+        key,
+        daysLeft,
+        urgency: daysLeft <= 1 ? 'high' : daysLeft <= 3 ? 'medium' : 'low',
+        message: buildReminderMessage({ ...item, daysLeft }),
+      }
+    })
+    .filter(Boolean)
+)
+
+const calendarMonthLabel = computed(() =>
+  calendarMonth.value.toLocaleDateString(undefined, {
+    month: 'long',
+    year: 'numeric',
+  })
+)
+
+const calendarDays = computed(() => {
+  const monthStart = startOfMonth(calendarMonth.value)
+  const gridStart = new Date(monthStart)
+  gridStart.setDate(monthStart.getDate() - monthStart.getDay())
+
+  const deadlineMap = new Map()
+  for (const item of calendarSavedDeadlines.value) {
+    const dayKey = formatDayKey(item.deadlineDate)
+    const existing = deadlineMap.get(dayKey) || []
+    existing.push(item)
+    deadlineMap.set(dayKey, existing)
+  }
+
+  return Array.from({ length: 42 }, (_, index) => {
+    const date = new Date(gridStart)
+    date.setDate(gridStart.getDate() + index)
+    const dayKey = formatDayKey(date)
+
+    return {
+      key: dayKey,
+      date,
+      isCurrentMonth: date.getMonth() === monthStart.getMonth(),
+      isToday: dayKey === formatDayKey(new Date()),
+      deadlines: deadlineMap.get(dayKey) || [],
+    }
+  })
+})
+
+const visibleCalendarDeadlines = computed(() => {
+  const month = calendarMonth.value.getMonth()
+  const year = calendarMonth.value.getFullYear()
+
+  return calendarSavedDeadlines.value
+    .filter((item) =>
+      item.deadlineDate.getMonth() === month &&
+      item.deadlineDate.getFullYear() === year
+    )
+    .slice(0, 5)
+})
 
 const displayedOpportunities = computed(() =>
   activeOpportunityView.value === 'for-you'
@@ -2002,6 +2248,32 @@ footer{
   margin-bottom:8px;
 }
 
+.sidebar-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+}
+
+.sidebar-heading h3{
+  margin:0;
+}
+
+.sidebar-count{
+  min-width:24px;
+  height:24px;
+  padding:0 8px;
+  border-radius:999px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(37,99,235,.1);
+  color:var(--accent);
+  font-size:12px;
+  font-weight:700;
+}
+
 .sidebar-actions{
   display:flex;
   flex-direction:column;
@@ -2042,6 +2314,170 @@ footer{
 .saved-meta{
   font-size:12px;
   color:rgba(15,23,42,.6);
+}
+
+.deadline-alert-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.deadline-alert{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  padding:12px;
+  border-radius:14px;
+  border:1px solid rgba(234,179,8,.22);
+  background:linear-gradient(180deg, #fffdf2, #fef3c7);
+}
+
+.deadline-alert[data-urgency="medium"]{
+  border-color:rgba(249,115,22,.24);
+  background:linear-gradient(180deg, #fff7ed, #ffedd5);
+}
+
+.deadline-alert[data-urgency="high"]{
+  border-color:rgba(239,68,68,.24);
+  background:linear-gradient(180deg, #fef2f2, #fee2e2);
+}
+
+.deadline-alert-title{
+  margin:0 0 4px;
+  font-size:13px;
+  font-weight:700;
+}
+
+.deadline-alert-text{
+  margin:0;
+  font-size:12px;
+  line-height:1.5;
+  color:rgba(15,23,42,.72);
+}
+
+.alert-dismiss{
+  width:28px;
+  height:28px;
+  border:none;
+  border-radius:999px;
+  background:rgba(255,255,255,.7);
+  color:rgba(15,23,42,.75);
+  font-size:18px;
+  line-height:1;
+  cursor:pointer;
+  flex-shrink:0;
+}
+
+.deadline-calendar{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.calendar-controls{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.calendar-label{
+  font-size:12px;
+  font-weight:700;
+  color:rgba(15,23,42,.72);
+}
+
+.calendar-nav-btn{
+  width:28px;
+  height:28px;
+  border-radius:999px;
+  border:1px solid rgba(148,163,184,.3);
+  background:#fff;
+  color:var(--text);
+  cursor:pointer;
+}
+
+.calendar-weekdays,
+.calendar-grid{
+  display:grid;
+  grid-template-columns:repeat(7, minmax(0, 1fr));
+  gap:6px;
+}
+
+.calendar-weekdays span{
+  text-align:center;
+  font-size:11px;
+  font-weight:700;
+  color:rgba(15,23,42,.5);
+}
+
+.calendar-day{
+  min-height:54px;
+  border-radius:12px;
+  padding:8px 6px;
+  background:rgba(248,250,252,.9);
+  border:1px solid rgba(148,163,184,.18);
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.calendar-day[data-current-month="false"]{
+  opacity:.45;
+}
+
+.calendar-day[data-is-today="true"]{
+  border-color:rgba(37,99,235,.35);
+  box-shadow:0 0 0 2px rgba(37,99,235,.08);
+}
+
+.calendar-day[data-has-deadline="true"]{
+  background:linear-gradient(180deg, rgba(239,246,255,.98), rgba(224,242,254,.95));
+}
+
+.calendar-date{
+  font-size:11px;
+  font-weight:700;
+}
+
+.calendar-markers{
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px;
+}
+
+.calendar-marker{
+  width:7px;
+  height:7px;
+  border-radius:999px;
+  background:linear-gradient(135deg, var(--accent), var(--accent-2));
+}
+
+.calendar-deadline-list{
+  list-style:none;
+  padding:0;
+  margin:0;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.calendar-deadline-list li{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:10px;
+  align-items:flex-start;
+}
+
+.calendar-deadline-date{
+  min-width:54px;
+  padding:6px 8px;
+  border-radius:999px;
+  background:rgba(37,99,235,.08);
+  color:var(--accent);
+  font-size:11px;
+  font-weight:700;
+  text-align:center;
 }
 
 /* Icon buttons */
