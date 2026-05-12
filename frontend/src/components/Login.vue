@@ -4,7 +4,7 @@ import {login} from '@/lib/authAPI'
 
 import { useAuth } from '@/lib/authStore'
 import { useRouter } from 'vue-router'
-const { setToken } = useAuth()
+const { setToken, setUser } = useAuth()
 const router = useRouter()
 
 
@@ -49,6 +49,7 @@ if (!errorMessage.value) {
 
     try {
       const data = await login(payload)
+      setUser(null)
       setToken(data.access_token, data.expires_in) // Pass expires_in
 
       await router.push('/moderation')

@@ -4,7 +4,7 @@ import {register} from '@/lib/authAPI'
 import { useAuth } from '@/lib/authStore'
 import { useRouter } from 'vue-router'
 
-const { setToken } = useAuth()
+const { setToken, setUser } = useAuth()
 const router = useRouter()
 
 
@@ -71,6 +71,7 @@ async function handleSignup() {
 
     try {
       const data = await register(payload)
+      setUser(null)
       setToken(data.access_token, data.expires_in) // Pass expires_in
       await router.push('/moderation')
 

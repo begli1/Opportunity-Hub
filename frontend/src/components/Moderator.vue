@@ -475,7 +475,7 @@ import AxiosInstance from '@/apiClient'
 import router from '@/router'
 import { useAuth } from '@/lib/authStore'
 
-const { clearToken, user } = useAuth()
+const { clearToken, setUser, user } = useAuth()
 const year = new Date().getFullYear()
 
 // User info from authStore
@@ -738,6 +738,22 @@ async function refresh() {
   await loadAll()
 }
 
+async function loadCurrentModerator() {
+  try {
+    const res = await AxiosInstance.get('/dashboard')
+    const me = res.data?.me
+    if (me) {
+      setUser({ id: me.id, username: me.username, email: me.email })
+    }
+  } catch (e) {
+    pageError.value =
+      e?.response?.data?.detail?.message ||
+      e?.response?.data?.detail ||
+      e?.message ||
+      'Could not load moderator profile'
+  }
+}
+
 /* appeal actions */
 async function decideAppeal(id, status, response = '') {
   if (!id) return
@@ -809,6 +825,7 @@ async function decideExternalUrl(id, approved) {
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
+  loadCurrentModerator()
   loadAll()
 })
 
